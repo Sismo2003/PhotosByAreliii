@@ -35,3 +35,4 @@ generate`. `Frontend/` solo tiene `package.json`, sin `astro.config.mjs` ni pág
   endpoint autenticado. Ver `.claude/skills/auth-gallery/SKILL.md`.
 
 - [[2026-10-24-repo-publico-y-git-workflow]] — repo público: allowlist, git-workflow, wiki/
+- [[2026-10-24-despliegue-grid]] — despliegue en grid: CI/CD por Tailscale, dominio y servidor como variables

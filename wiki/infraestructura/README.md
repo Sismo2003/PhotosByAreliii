@@ -5,18 +5,21 @@ estado: activo
 
 # Infraestructura
 
-Dónde y cómo corre el producto: servidor propio en Hetzner con Docker, nginx de entrada,
-almacenamiento de fotos en disco con límite fijo.
+Dónde y cómo corre el producto: servidor propio `grid` (Tailscale) con Docker y el `nginx-proxy` compartido,
+CI/CD desde GitHub Actions, almacenamiento de fotos en disco.
 
 ## Estado actual
 
 - Especificación aprobada del almacenamiento, la barra de disco y el bloqueo de subidas:
   `docs/almacenamiento-fotos.md`.
-- Hay `deploy/docker-compose.yml` y `deploy/nginx/photosbyareliii.conf` (escritos, **sin probar**).
-- Falta: `deploy/setup-storage.sh` (descrito en la especificación, no escrito), los Dockerfiles de
-  `Frontend/` y `Backend/`, los certificados TLS y el servidor real.
+- **2026-10-24:** despliegue a `grid` preparado y probado en local: Dockerfiles, compose, vhost, rollout, CI/CD y
+  runbook en `docs/deploy.md`. Ver [[2026-10-24-despliegue-grid]]. **Pendiente: el primer rollout real.**
+- El nginx de borde de Hetzner (`photosbyareliii.conf`) se eliminó; el plan de Hetzner quedó como histórico.
+- Sigue sin implementar: `deploy/setup-storage.sh` (disco de tamaño fijo, `docs/almacenamiento-fotos.md` §2).
 
 ## Entradas de bitácora
+
+- [[2026-10-24-despliegue-grid]] — CI/CD por Tailscale, dominio y servidor como variables, ensayo local
 
 - [[2026-10-02-stack-hetzner-y-almacenamiento]] — stack, Hetzner en lugar de R2, disco con tamaño fijo, nginx y rutas
 

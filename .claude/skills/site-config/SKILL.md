@@ -51,6 +51,16 @@ Everything in it ends up in a browser bundle: **public data only** (no keys, no 
 `<app>/Dockerfile.dockerignore` that only lets `<app>/` and `shared/` through — see `client/`.
 `COPY shared /repo/shared` next to the app at `/repo/<app>` so `../shared` resolves.
 
+## The logo — `shared/brand.js`
+
+The logo path lives in **one variable**: `LOGO` in `shared/brand.js` (`onLight`, `onDark`; paths relative
+to `shared/`, files in `shared/brand/`, transparent PNGs). Each app has a `Logo` component that reads
+it (`client/src/components/Logo.jsx`, `admin/src/components/shared/Logo.jsx`,
+`Frontend/src/components/Logo.astro`); never reference the PNGs directly. To change the logo: replace the
+files and/or edit the two paths, then rebuild. `brand.js` is tracked (not like `site.js`) and
+`!shared/brand/*.png` is un-ignored in `.gitignore`, because CI builds need them. The admin image is
+built with the repo root as context (like client/) for the same reason.
+
 ## `services.json` shape
 
 One entry per session type, straight from the client's pricing sheet. Prices are **starting

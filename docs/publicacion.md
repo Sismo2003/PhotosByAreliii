@@ -11,6 +11,7 @@ Nada sale de la máquina hasta que el dueño autoriza un `git push` (skill `git-
 | Plantillas de configuración | `*/.env.example`, `shared/site.example.js` | solo valores de ejemplo |
 | Documentación técnica | `docs/`, `handoff.md`, `*/handoff.md`, `CLAUDE.md`, `README.md`, `SECURITY.md` | datos de ejemplo |
 | **Bitácora de agentes** | `wiki/` | **sí se publica**: decisiones y contexto, sin datos reales |
+| Una imagen | `client/public/login.jpg` (fondo del login) | © Photos By Areliii LLC, sin GPS ni datos de cámara; ver `derechos-imagenes.md` |
 | Skills del proyecto | `.claude/skills/<las listadas en .gitignore>`, `.claude/settings.json` | no incluye `graphify` |
 
 ## Se queda local (ignorado)
@@ -19,7 +20,7 @@ Nada sale de la máquina hasta que el dueño autoriza un `git push` (skill `git-
 |---|---|
 | Secretos y configuración real | `.env`, `Backend/.env`, `database/.env` |
 | Datos reales del negocio | `shared/site.js` |
-| Fotos, PDFs, docx del negocio | `storage/`, `Photos By Areliii LLC/`, `views/`, `*.jpg`, `*.pdf`, `*.docx` |
+| Fotos, PDFs, docx del negocio | `storage/`, `Photos By Areliii LLC/`, `views/`, `*.jpg` (salvo el login), `*.pdf`, `*.docx` |
 | Notas con datos reales | `private/` (misma estructura que `wiki/`) |
 | Scratch y dependencias | `Backend/_t*.mjs`, `node_modules/`, `dist/`, `graphify-out/` |
 

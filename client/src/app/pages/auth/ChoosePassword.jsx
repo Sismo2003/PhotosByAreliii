@@ -13,7 +13,7 @@ import { useAuth } from "app/auth";
 import { Button } from "components/ui";
 import { LanguageSwitch } from "components/LanguageSwitch";
 import { useDocumentTitle } from "hooks/useDocumentTitle";
-import { APP_NAME } from "constants/app.constant";
+import { Logo } from "components/Logo";
 import { RULES, checkPassword, meetsAllRules } from "utils/passwordRules";
 
 // state: idle (not checked yet) | met | unmet
@@ -126,7 +126,7 @@ export default function ChoosePassword() {
   return (
     <main className="min-h-100vh flex flex-col bg-paper px-4 pt-[calc(var(--safe-top)+2rem)] pb-[calc(var(--safe-bottom)+2rem)] sm:px-12">
       <div className="mx-auto flex w-full max-w-[416px] items-center justify-between">
-        <span className="wordmark text-ink">{APP_NAME}</span>
+        <Logo className="h-12" />
         <LanguageSwitch />
       </div>
 

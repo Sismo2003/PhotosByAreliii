@@ -1,0 +1,11 @@
+# Context is the repo root: send only what the site build needs.
+*
+!package.json
+!package-lock.json
+!Frontend
+!shared
+!Backend/package.json
+!database/package.json
+**/node_modules
+Frontend/dist
+Frontend/.astro

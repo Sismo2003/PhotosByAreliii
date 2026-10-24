@@ -4,6 +4,7 @@
 
 ## 0. Empieza aquí
 
+0. **Git y publicación**: el repo es público; skill `git-workflow` (nunca `git push` sin autorización del dueño) y `docs/publicacion.md`.
 1. **`CLAUDE.md`** — reglas del proyecto: fechas siempre con **Luxon** (`America/Phoenix`) y
    teléfonos siempre con **libphonenumber-js**.
 2. **Datos reales del negocio** (precios, políticas, contacto): no están en el repo público; los
@@ -53,8 +54,8 @@
 | `Backend/` | Arranca con `npm run dev` (puerto 4000). Montados: **`/api/auth/*`** (login con email **o teléfono**, logout, me, change-password), **`/api/admin/bookings/*`** (Requests: lista, calendario, detalle con `detailChanges`, confirm, decline, match) y **`/api/admin/services/active`** — ver [[2026-10-03-bookings-backend]] en `wiki/admin/`. Errores con `utils/http.js`. `config/db.js` usa `@prisma/adapter-mariadb`. **`/api/admin/clients/*`** y **`/api/admin/galleries/*`** + **`/api/admin/storage`** ya están montados (2026-10-04). |
 | `admin/` | **Nuevo.** React 19 + Vite 6 + Tailwind 4, a partir del template Tailux del usuario, re-tematizado con el sistema de diseño. Login con un solo campo "Email or phone" y botón Show/Hide (oculta por defecto), dos layouts (Sideblock por defecto, Main layout opcional), Display con engrane giratorio, barra de almacenamiento, Overview y Settings con pestañas. El resto son páginas vacías. `npm run dev` usa el login real contra el Backend (el bypass de desarrollo se eliminó el 2026-10-09). Ver `admin/README.md`. |
 | `client/` | **Nuevo (2026-10-09).** Portal del cliente + página única `/login`. Empieza por `client/handoff.md`. |
-| `Frontend/` | Solo `package.json` (Astro 7 + React 19 + Tailwind 4). **Nada implementado.** |
-| `deploy/` | `docker-compose.yml` + `nginx/photosbyareliii.conf`, **sin probar**. Faltan `deploy/setup-storage.sh` y los Dockerfiles de `Frontend/` y `Backend/`. |
+| `Frontend/` | Sitio público **mínimo** (Astro estático: una página con enlaces a `/login`, Instagram y correo; `noindex` mientras el dominio sea temporal). Falta la landing real y `/book`. |
+| `deploy/` · `.github/` | **Despliegue al servidor `grid`** (CI/CD por Tailscale). Imágenes, compose, vhost, rollout y CI probados en local; **el primer rollout real está pendiente**. Ver `docs/deploy.md`. |
 | `docs/` | `almacenamiento-fotos.md` (aprobada) y `correos.md` v2 (aprobada en lo general; quedan 5 puntos en su §12). |
 
 ### 1.1 Levantar todo en local
@@ -109,7 +110,8 @@ usuario edita el lienzo en vivo**: vuelve a leer una pantalla antes de republica
 | Fotos, disco y despliegue | `docs/almacenamiento-fotos.md` | Hetzner, sistemas de archivos de tamaño fijo, barra del sidebar, bloqueo con 500 MB, borrado al vencer. |
 | Correos | `docs/correos.md` | Hostinger SMTP por el **587**, 25 correos, plantillas editables (GrapesJS + MJML), bandeja, `settings.json`. |
 | Admin | `admin/README.md` | Cómo se adaptó el template, API que espera, comandos, despliegue. |
-| Despliegue | `deploy/docker-compose.yml`, `deploy/nginx/photosbyareliii.conf` | `photosbyareliii.com/` sitio, `/admin/` admin, `/api/` backend; `admin.` y `www.` hacen 301. |
+| Despliegue | `docs/deploy.md`, skill `deploy` | `areli.grid.nimbuscloud.mx/` sitio, `/login`, `/client/`, `/admin/`, `/api/` (un solo origen); dominio y servidor son variables. |
+| Publicación | `docs/publicacion.md` · `docs/derechos-imagenes.md` | Qué va a GitHub y qué se queda local; la única imagen pública y su copyright. |
 
 ## 4. Decisiones del usuario (no cambiar sin preguntar)
 
@@ -129,7 +131,7 @@ usuario edita el lienzo en vivo**: vuelve a leer una pantalla antes de republica
 - **Las fotos se borran cuando vence la galería**, con email al cliente **48 h antes**.
 
 **Infraestructura**
-- Servidor propio en **Hetzner** con Docker y **nginx**. Fotos en el disco del servidor, **no en R2**.
+- Servidor propio **`grid`** (red de Tailscale) con Docker y el `nginx-proxy` compartido; se llega **solo por Tailscale**. Fotos en el disco del servidor (`$DATA_DIR/photos`), **no en R2**. (Antes se planeó Hetzner; ver `wiki/infraestructura`.)
 - Barra de disco en el sidebar: verde con más de 60% libre, ámbar de 60% a 30%, rojo por debajo.
 - Con **500 MB** libres o menos no se sube nada. El mensaje apunta a borrar galerías viejas o a
   escribir a soporte@nimbuscloud.mx (enlace `mailto:`).
@@ -160,8 +162,9 @@ usuario edita el lienzo en vivo**: vuelve a leer una pantalla antes de republica
    Cada página vacía dice qué pantalla y qué especificación implementar.
 4. **Frontend** (skills `frontend`, `site-config`, `landing-seo`): tokens, `site.js` /
    `services.json` con los datos reales y la landing.
-5. **Despliegue**: `deploy/setup-storage.sh`, los Dockerfiles de `Backend/` y `Frontend/`, y probar
-   el compose con Docker encendido.
+5. **Despliegue**: hacer el primer rollout real en `grid` (`docs/deploy.md` §4: `server-setup.sh`, `.env`, llave de CI,
+   secrets de GitHub). El límite de disco por sistema de archivos de tamaño fijo (`docs/almacenamiento-fotos.md` §2) sigue sin
+   implementar: en `grid` las fotos van a un directorio normal.
 6. **Correos**: resolver `docs/correos.md` §12 y crear el buzón de Hostinger con el DNS.
 
 ## 6. Pendientes
@@ -210,7 +213,6 @@ usuario edita el lienzo en vivo**: vuelve a leer una pantalla antes de republica
 - El seed **desde dentro** del contenedor: la imagen se tiene que reconstruir con `-V` para tener
   argon2 y el adapter. Docker Desktop se colgó en ese momento, se forzó a cerrar y quedó
   encendido, pero **`pba-dev-mysql-1` y `pba-dev-prisma-1` están apagados**: levantar con §1.1.
-- `Backend/` no tiene Dockerfile todavía.
 
 ### Sesión 2026-10-02 (diseño, base, infraestructura, admin)
 
@@ -224,7 +226,7 @@ usuario edita el lienzo en vivo**: vuelve a leer una pantalla antes de republica
 
 **No verificado**
 - No se ha visto en pantalla: el Main layout, el engrane, el selector de layout ni el modo `dev`.
-- Producción (`deploy/`, nginx): no se ha construido ni levantado nada.
+- Producción: las imágenes, el compose y el vhost se probaron **en local** (2026-10-24); nada se ha ejecutado en el servidor `grid`.
 - (Al cierre de esa sesión no había base ni backend; ver la sesión de la noche arriba.)
 - No se hizo ningún commit.
 

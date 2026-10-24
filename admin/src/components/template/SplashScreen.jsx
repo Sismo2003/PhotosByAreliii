@@ -1,12 +1,13 @@
 // Local Imports
 import { Progress } from "components/ui";
+import { Logo } from "components/shared/Logo";
 
 // ----------------------------------------------------------------------
 
 export function SplashScreen() {
   return (
     <div className="fixed grid h-full w-full place-content-center gap-4 bg-paper">
-      <span className="wordmark text-ink">Photos by Areliii</span>
+      <Logo className="h-14" />
       <Progress
         color="primary"
         isIndeterminate

@@ -17,7 +17,7 @@ import {
   UserCircleIcon as UserSolid,
 } from "@heroicons/react/24/solid";
 
-import { APP_NAME } from "constants/app.constant";
+import { Logo } from "components/Logo";
 
 const OTHER_TABS = ["/client/bookings", "/client/payments", "/client/profile"];
 
@@ -44,8 +44,8 @@ function TopBar() {
   return (
     <header className="sticky top-0 z-30 hidden border-b border-line bg-paper/85 backdrop-blur-md md:block dark:bg-dark-900/85">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-8">
-        <NavLink to="/client" className="wordmark text-ink">
-          {APP_NAME}
+        <NavLink to="/client" aria-label="Photos by Areliii" className="flex items-center">
+          <Logo className="h-10" />
         </NavLink>
         <nav aria-label={t("nav.label")} className="flex items-center gap-8">
           {TABS.map((tab) => (

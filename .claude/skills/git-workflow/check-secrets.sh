@@ -17,7 +17,7 @@ fail() { echo "✗ $1"; bad=1; }
 
 # 1. Forbidden file names / extensions
 echo "$FILES" | grep -E '(^|/)\.env($|\.)|\.(pem|key|crt|p12|pfx|jpe?g|png|webp|heic|gif|pdf|docx|xlsx|zip|dump|sqlite3?|db|log)$|(^|/)(Backend/storage|Backend/uploads|node_modules|dist)/|pass-temp' \
-  | grep -vE '\.env\.example$|\.env\.development$|(admin|client)/public/favicon\.png$' \
+  | grep -vE '\.env\.example$|\.env\.development$|(admin|client)/public/favicon\.png$|client/public/login\.jpg$' \
   | while read -r f; do echo "✗ archivo prohibido: $f"; done | grep . && bad=1
 
 # 2. Big files (> 2 MB)

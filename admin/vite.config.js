@@ -11,6 +11,8 @@ export default defineConfig({
   plugins: [react(), jsconfigPaths(), svgr(), tailwindcss()],
   server: {
     port: 5174,
+    // The logo lives in the repo-root shared/ (shared/brand.js), common to every app.
+    fs: { allow: [".", "../shared"] },
     proxy: {
       "/api": {
         target: process.env.VITE_API_PROXY || "http://localhost:4000",

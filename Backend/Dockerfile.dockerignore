@@ -1,0 +1,14 @@
+# Context is the repo root: send only what the API needs.
+*
+!package.json
+!package-lock.json
+!Backend
+!database
+!shared
+!Frontend/package.json
+**/node_modules
+Backend/.env
+Backend/storage
+Backend/_t*.mjs
+database/.env
+database/generated

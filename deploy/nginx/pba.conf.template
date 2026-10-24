@@ -1,0 +1,125 @@
+# =============================================================================
+#  pba.conf.template — vhost of photosByArelli for the shared nginx-proxy
+# -----------------------------------------------------------------------------
+#  Source of truth. rollout.sh renders it with envsubst (ONLY ${APP_DOMAIN} and ${TLS_CERT_DIR}, so the
+#  nginx variables below survive) into  $NGINX_CONF_DIR/pba.conf, tests it with `nginx -t` and restores
+#  the previous one if the test fails.
+#
+#  https://${APP_DOMAIN}/          → pba-web     (public Astro site)
+#  https://${APP_DOMAIN}/login     → pba-client  (the ONE sign-in page for admins and clients)
+#  https://${APP_DOMAIN}/client/   → pba-client  (client portal)
+#  https://${APP_DOMAIN}/admin/    → pba-admin   (studio admin)
+#  https://${APP_DOMAIN}/api/      → pba-api     (Express)
+#
+#  ONE ORIGIN for everything: the httpOnly session cookie travels without CORS. If the API ever moves
+#  to its own subdomain the cookie has to become sameSite:'none'.
+#
+#  Upstreams are variables + resolver 127.0.0.11 on purpose: nginx resolves the container name at
+#  request time, so this shared proxy still starts and reloads while our containers are down.
+#
+#  TLS: ${TLS_CERT_DIR}. For *.grid.nimbuscloud.mx a single-level name like areli.grid… is covered by
+#  the wildcard (a second level, admin.areli.grid…, would NOT be — that is why admin is a path).
+#  DNS: the wildcard *.grid already resolves to the server (grey cloud, not proxied).
+# =============================================================================
+
+map $http_upgrade $pba_connection_upgrade {
+  default upgrade;
+  ""      close;
+}
+
+# Brute force against the login endpoint is cut at the edge, before an argon2 hash is spent per try.
+limit_req_zone $binary_remote_addr zone=pba_login:10m rate=10r/m;
+
+# --- HTTP → HTTPS --------------------------------------------------------------
+server {
+  listen 80;
+  server_name ${APP_DOMAIN};
+  return 301 https://$host$request_uri;
+}
+
+server {
+  listen 443 ssl;
+  http2 on;
+  server_name ${APP_DOMAIN};
+
+  ssl_certificate     ${TLS_CERT_DIR}/fullchain.pem;
+  ssl_certificate_key ${TLS_CERT_DIR}/privkey.pem;
+  ssl_protocols       TLSv1.2 TLSv1.3;
+
+  access_log /var/log/nginx/pba-access.log;
+  error_log  /var/log/nginx/pba-error.log;
+
+  resolver 127.0.0.11 valid=10s ipv6=off;
+
+  # Headers at server level (an add_header inside a location replaces every inherited one).
+  add_header Strict-Transport-Security "max-age=31536000" always;
+  add_header X-Content-Type-Options "nosniff" always;
+  add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+  add_header Permissions-Policy "geolocation=(), microphone=(), camera=(), interest-cohort=()" always;
+
+  proxy_http_version 1.1;
+  proxy_set_header Host              $host;
+  proxy_set_header X-Real-IP         $remote_addr;
+  proxy_set_header X-Forwarded-For   $remote_addr;
+  proxy_set_header X-Forwarded-Proto $scheme;
+
+  # The global nginx.conf redirects 502/503/504 to another site; a client opening their gallery
+  # should see what happened instead.
+  error_page 502 503 504 = @pba_down;
+  location @pba_down {
+    default_type application/json;
+    return 503 '{"error":true,"message":"Service temporarily unavailable. Please try again in a moment."}';
+  }
+
+  # Sign-in attempts only (tight limit, then 429).
+  location = /api/auth/login {
+    limit_req zone=pba_login burst=5 nodelay;
+    limit_req_status 429;
+    client_max_body_size 64k;
+    set $pba_api http://pba-api:4000;
+    proxy_pass $pba_api;
+  }
+
+  # API. Photo uploads are one photo per request, max 50 MB each (docs/almacenamiento-fotos.md §5.3);
+  # downloads stream, so no buffering.
+  location /api/ {
+    client_max_body_size 60m;
+    proxy_request_buffering off;
+    proxy_buffering off;
+    proxy_connect_timeout 10s;
+    proxy_read_timeout 300s;
+    proxy_send_timeout 300s;
+    set $pba_api http://pba-api:4000;
+    proxy_pass $pba_api;
+  }
+
+  # Shared sign-in page (client/ app). The old per-app sign-in URLs land on it, keeping ?redirect=…
+  location = /login {
+    client_max_body_size 1m;
+    set $pba_client http://pba-client:80;
+    proxy_pass $pba_client;
+  }
+  location = /admin/login  { return 302 /login$is_args$args; }
+  location = /client/login { return 302 /login$is_args$args; }
+
+  location = /client { return 301 /client/; }
+  location /client/ {
+    client_max_body_size 1m;
+    set $pba_client http://pba-client:80;
+    proxy_pass $pba_client;
+  }
+
+  location = /admin { return 301 /admin/; }
+  location /admin/ {
+    client_max_body_size 1m;
+    set $pba_admin http://pba-admin:80;
+    proxy_pass $pba_admin;
+  }
+
+  # Public site
+  location / {
+    client_max_body_size 1m;
+    set $pba_web http://pba-web:80;
+    proxy_pass $pba_web;
+  }
+}

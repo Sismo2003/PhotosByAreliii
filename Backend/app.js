@@ -34,6 +34,9 @@ app.use('/api/admin/extras', extraRoutes);
 // CLIENT PORTAL (photosbyareliii.com/client/)
 app.use('/api/client', clientPortalRoutes);
 
+// Liveness probe for the container healthcheck and the rollout (no DB access on purpose).
+app.get('/api/health', (_req, res) => res.json({ error: false, message: 'ok', data: { status: 'up' } }));
+
 app.use('/api', (_req, res) => {
   res.status(404).json({ error_message: 'Route not found', message: 'Not found', error: true });
 });

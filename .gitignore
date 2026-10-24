@@ -7,6 +7,7 @@
 
 # ── 2. Publishable (documented code + minimum to clone and run) ─────────────
 !/.gitignore
+!/.github/
 !/README.md
 !/SECURITY.md
 !/CLAUDE.md
@@ -36,6 +37,7 @@
 !/.claude/skills/bitacora/
 !/.claude/skills/client-portal/
 !/.claude/skills/db-migrations/
+!/.claude/skills/deploy/
 !/.claude/skills/frontend/
 !/.claude/skills/git-workflow/
 !/.claude/skills/landing-seo/
@@ -94,10 +96,16 @@ Backend/uploads/
 *.pdf
 *.docx
 *.xlsx
+
+# The app's own logo (shared/brand.js) must be tracked: CI builds need it.
+!shared/brand/*.png
 *.zip
 # …except the app favicons
 !admin/public/favicon.png
 !client/public/favicon.png
+# …and the sign-in background: published on purpose, GPS/camera data stripped, copyright embedded
+# (docs/derechos-imagenes.md). Any other photo stays out.
+!client/public/login.jpg
 
 # Scratch / OS / editor
 _t*.mjs

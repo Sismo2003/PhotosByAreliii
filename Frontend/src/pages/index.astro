@@ -1,0 +1,39 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Logo from "../components/Logo.astro";
+import { BRAND, CONTACT, SOCIAL } from "@shared/site";
+
+// A national-format display of the E.164 number is added when the real number is set; until then
+// the contact block only shows what shared/site.js actually defines.
+const email = CONTACT.emails?.primary;
+---
+
+<Layout
+  title="Photography sessions on location"
+  description={`${BRAND.name} — photography sessions on location: portraits, couples, family, graduates and events.`}
+>
+  <main class="mx-auto flex min-h-screen max-w-3xl flex-col justify-center gap-8 px-6 py-16">
+    <p class="text-sm uppercase tracking-[0.3em]" style="color: var(--accent)">Photography</p>
+    <h1><Logo class="h-28 w-auto sm:h-36" /></h1>
+    <p class="max-w-xl text-lg leading-relaxed">
+      Sessions on location for portraits, couples, family, graduates and special events.
+      Our full website and booking form are coming soon.
+    </p>
+
+    <nav class="flex flex-wrap gap-4 text-base">
+      <a class="rounded-full border px-6 py-3" style="border-color: var(--ink)" href="/login">Client sign-in</a>
+      {SOCIAL.instagram && (
+        <a class="rounded-full border px-6 py-3" style="border-color: var(--ink)" href={SOCIAL.instagram} rel="noopener">
+          Instagram
+        </a>
+      )}
+      {email && (
+        <a class="rounded-full border px-6 py-3" style="border-color: var(--ink)" href={`mailto:${email}`}>
+          Email
+        </a>
+      )}
+    </nav>
+
+    <footer class="text-sm opacity-70">© {new Date().getFullYear()} {BRAND.legalName}. All rights reserved.</footer>
+  </main>
+</Layout>

@@ -45,7 +45,7 @@ estrictas y **ganan** sobre cualquier otra skill (incluida la global `git-pushin
 ## Qué NUNCA entra al repo
 
 `.env*` reales (solo `.env.example`), `shared/site.js` real (solo `site.example.js`), la carpeta `private/`, contraseñas temporales, fotos de clientes o del portafolio
-(`storage/`, `uploads/`, `*.jpg`…), documentos del negocio (`*.docx`, `*.pdf`), dumps de base de datos,
+(`storage/`, `uploads/`, `*.jpg`…; única excepción: `client/public/login.jpg`), documentos del negocio (`*.docx`, `*.pdf`), dumps de base de datos,
 correos/teléfonos reales de clientes (usa `example.com` y `555-01xx`), llaves (`*.pem`, `*.key`).
 Para publicar un archivo nuevo hay que agregarlo al allowlist de `.gitignore` a propósito.
 

@@ -10,6 +10,7 @@ import { useAuthContext } from "app/contexts/auth/context";
 import { useBreakpointsContext } from "app/contexts/breakpoint/context";
 import { useSidebarContext } from "app/contexts/sidebar/context";
 import { navigation } from "app/navigation";
+import { Logo } from "components/shared/Logo";
 import { StorageBar } from "components/shared/storage/StorageBar";
 import { useStorageStatus } from "components/shared/storage/useStorageStatus";
 import { useDidUpdate } from "hooks";
@@ -41,8 +42,8 @@ export function Sidebar() {
     <div className="sidebar-panel">
       <div className="flex h-full grow flex-col gap-10 overflow-y-auto bg-paper-alt px-7 pt-8 pb-6">
         <div className="flex items-center justify-between">
-          <NavLink to="/" onClick={onNavigate} className="wordmark text-ink">
-            Photos by Areliii
+          <NavLink to="/" onClick={onNavigate} aria-label="Photos by Areliii" className="flex items-center">
+            <Logo className="h-12" />
           </NavLink>
           <button
             type="button"

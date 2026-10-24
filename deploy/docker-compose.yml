@@ -1,83 +1,125 @@
-# Production stack on the Hetzner server. Run from this folder: docker compose up -d --build
-# Disk limits (fixed-size filesystems for photos, MySQL and mail) are created first with
-# deploy/setup-storage.sh — see docs/almacenamiento-fotos.md §2 and docs/correos.md §8.
+# =============================================================================
+#  deploy/docker-compose.yml — photosByArelli on the `grid` server (or any Docker host)
+# -----------------------------------------------------------------------------
+#  Applied by deploy/rollout.sh; run by hand only to debug. Images are NOT built here: CI builds
+#  them (.github/workflows/ci-cd.yml) and pushes them to ghcr.io; the server only pulls.
+#
+#  This compose starts NO reverse proxy. The host already runs a shared `nginx-proxy` container
+#  (ports 80/443) that loads one vhost per project from its conf.d/. rollout.sh renders this
+#  project's vhost from deploy/nginx/pba.conf.template and installs it there. A host without
+#  nginx-proxy can get one from deploy/proxy/ (see docs/deploy.md §6).
+#
+#  Networks:
+#    nginx        external, shared with nginx-proxy — web/admin/client/api join it so the proxy
+#                 reaches them by container name.
+#    pba-internal internal (no route to the internet) — api <-> mysql only. MySQL publishes no port.
+#
+#  Everything that changes between servers/domains lives in deploy/.env (see .env.template).
+# =============================================================================
+
+# Explicit project name: Compose would otherwise use the folder name ("deploy"), shared with the
+# other projects on the server, and `down --remove-orphans` in one would remove the others.
+name: pba
 
 x-logging: &logging
   driver: json-file
   options: { max-size: "10m", max-file: "3" }
 
-services:
-  nginx:
-    image: nginx:1.27-alpine
-    ports: ["80:80", "443:443"]
-    volumes:
-      - ./nginx/photosbyareliii.conf:/etc/nginx/conf.d/default.conf:ro
-      - /etc/letsencrypt:/etc/letsencrypt:ro
-      - /var/www/certbot:/var/www/certbot:ro
-    depends_on: [web, admin, client, api]
-    restart: unless-stopped
-    logging: *logging
+x-hardening: &hardening
+  restart: unless-stopped
+  security_opt: ["no-new-privileges:true"]
+  logging: *logging
 
-  admin:
-    build:
-      context: ../admin
-      args:
-        VITE_SITE_URL: https://photosbyareliii.com
+services:
+  mysql:
+    <<: *hardening
+    image: mysql:8.4
+    container_name: pba-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?missing MYSQL_ROOT_PASSWORD in deploy/.env}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-photosbyarelli}
+      MYSQL_USER: ${MYSQL_USER:-pba}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?missing MYSQL_PASSWORD in deploy/.env}
+      TZ: UTC # the database stores UTC; the studio zone (America/Phoenix) is applied in the apps
+    volumes:
+      - ${DATA_DIR:-/srv/pba}/mysql:/var/lib/mysql
+    networks: [pba-internal]
+    mem_limit: 1g
+    healthcheck:
+      # The password is passed so the check proves the credentials work, not just that mysqld answers.
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u root -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 40s
+
+  api:
+    <<: *hardening
+    image: ${IMAGE_PREFIX:-ghcr.io/sismo2003/pba}-api:${PBA_TAG:-latest}
+    container_name: pba-api
+    env_file:
+      - ../Backend/.env # secrets (JWT_SECRET, GALLERY_ENC_KEY, SMTP…) — server only, never in git
+    environment:
+      # Deployment properties win over whatever Backend/.env says.
+      NODE_ENV: production
+      PORT: "4000"
+      DATABASE_URL: mysql://${MYSQL_USER:-pba}:${MYSQL_PASSWORD}@mysql:3306/${MYSQL_DATABASE:-photosbyarelli}
+      CLIENT_ORIGIN: https://${APP_DOMAIN:?missing APP_DOMAIN in deploy/.env}
+      STORAGE_PATH: /data/storage
+    volumes:
+      - ${DATA_DIR:-/srv/pba}/photos:/data/storage # photos live on the host disk, owned by uid 1000
+    user: "1000:1000"
+    read_only: true
+    tmpfs: ["/tmp:size=256m"]
+    networks: [nginx, pba-internal]
+    depends_on:
+      mysql: { condition: service_healthy }
+    mem_limit: 1536m
+    healthcheck:
+      # 127.0.0.1, not localhost: inside the container localhost resolves to ::1 first.
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:4000/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  web:
+    <<: *hardening
+    image: ${IMAGE_PREFIX:-ghcr.io/sismo2003/pba}-web:${PBA_TAG:-latest}
+    container_name: pba-web
+    networks: [nginx]
     read_only: true
     tmpfs: ["/var/cache/nginx", "/var/run", "/tmp"]
-    restart: unless-stopped
-    logging: *logging
+    mem_limit: 128m
+
+  admin:
+    <<: *hardening
+    image: ${IMAGE_PREFIX:-ghcr.io/sismo2003/pba}-admin:${PBA_TAG:-latest}
+    container_name: pba-admin
+    networks: [nginx]
+    read_only: true
+    tmpfs: ["/var/cache/nginx", "/var/run", "/tmp"]
+    mem_limit: 128m
 
   # Client portal + the shared /login page
   client:
-    build:
-      context: .. # repo root, for shared/ (client/Dockerfile.dockerignore limits what is sent)
-      dockerfile: client/Dockerfile
-      args:
-        VITE_SITE_URL: https://photosbyareliii.com
+    <<: *hardening
+    image: ${IMAGE_PREFIX:-ghcr.io/sismo2003/pba}-client:${PBA_TAG:-latest}
+    container_name: pba-client
+    networks: [nginx]
     read_only: true
     tmpfs: ["/var/cache/nginx", "/var/run", "/tmp"]
-    restart: unless-stopped
-    logging: *logging
+    mem_limit: 128m
 
-  # Public Astro site — Dockerfile pending (Frontend/ isn't built yet). It imports shared/site.js, so
-  # build it like `client`: context .. + dockerfile Frontend/Dockerfile + Frontend/Dockerfile.dockerignore.
-  web:
-    build: ../Frontend
-    read_only: true
-    tmpfs: ["/var/cache/nginx", "/var/run", "/tmp"]
-    restart: unless-stopped
-    logging: *logging
-
-  # Express API — Dockerfile pending (Backend/ has no server.js yet).
-  # Base it on node:<v>-slim, not -alpine: onnxruntime-node (face focus, docs/api-galleries.md) needs glibc.
-  # It imports ../shared/site.js (calendar files), so build it like `client`: context .. + Backend/Dockerfile.
-  api:
-    build: ../Backend
-    user: "1000:1000"
-    read_only: true
-    tmpfs: ["/tmp:size=64m"]
-    mem_limit: 1536m
-    env_file: ./api.env
-    environment:
-      STORAGE_PATH: /app/storage
-      MAIL_STORAGE_PATH: /app/mail
-      CONFIG_PATH: /app/config/settings.json
-      STORAGE_RESERVE_BYTES: "524288000"
-      SUPPORT_EMAIL: soporte@nimbuscloud.mx
-    volumes:
-      - /srv/pba/photos:/app/storage
-      - /srv/pba/mail:/app/mail
-      - /srv/pba/config:/app/config
-    depends_on: [mysql]
-    restart: unless-stopped
-    logging: *logging
-
-  mysql:
-    image: mysql:8.4
-    mem_limit: 1g
-    env_file: ./mysql.env
-    volumes:
-      - /srv/pba/mysql:/var/lib/mysql
-    restart: unless-stopped
-    logging: *logging
+networks:
+  nginx:
+    name: nginx
+    external: true
+  pba-internal:
+    internal: true
+    # FIXED subnet, not whatever Docker picks: on `grid` the 172.17–31 pools are exhausted and Docker
+    # falls back to 192.168.x, but the firewall's DOCKER-USER chain only lets 172.16.0.0/12 talk to each
+    # other — with 192.168.x the API resolves `mysql` and the TCP silently dies. Pick a free /24 per project.
+    ipam:
+      config:
+        - subnet: ${PBA_SUBNET:-172.16.43.0/24}

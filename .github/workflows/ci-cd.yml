@@ -1,0 +1,214 @@
+# =============================================================================
+#  ci-cd.yml — quality gate + image build + rollout on the grid server
+# -----------------------------------------------------------------------------
+#  Branches and PRs: only the checks run.
+#  Push to main:     checks → build 4 images → push to ghcr.io → rollout on the server.
+#
+#  The server is reachable ONLY through Tailscale: the runner joins the tailnet as an ephemeral node,
+#  triggers the rollout over SSH and disappears when the job ends. No public port is opened.
+#
+#  Repository → Settings → Secrets and variables → Actions
+#    Variables:
+#      APP_DOMAIN               public host, e.g. areli.grid.nimbuscloud.mx (baked into the images)
+#      PUBLIC_INDEXABLE         "false" on temporary domains, "true" on the official one
+#    Secrets:
+#      TS_OAUTH_CLIENT_ID, TS_OAUTH_SECRET   Tailscale OAuth client (tag:ci)
+#      SSH_HOST      Tailscale IP or MagicDNS name of the server (change THIS to move servers)
+#      SSH_USER      the CI bot user (grid-bot-git)
+#      SSH_PORT      sshd port on the server
+#      SSH_PRIVATE_KEY   key of deploy/server-setup.sh --install-trigger (forced command)
+#      SITE_JS_B64   base64 of the REAL shared/site.js (git-ignored). Optional: without it the
+#                    images carry the example data from shared/site.example.js.
+#  Publishing to ghcr.io needs no secret: the automatic GITHUB_TOKEN is enough.
+#  Full runbook: docs/deploy.md
+# =============================================================================
+name: CI/CD
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+  workflow_dispatch:
+
+# Branches/PRs cancel the stale run. main does NOT: cancelling a half-done deploy would leave the
+# server in an undefined state (images pulled, containers not recreated).
+concurrency:
+  group: cicd-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+env:
+  REGISTRY: ghcr.io
+  # Lowercase on purpose: ghcr.io rejects uppercase and expressions have no toLower().
+  IMAGE_PREFIX: ghcr.io/sismo2003/pba
+
+jobs:
+  # ---------------------------------------------------------------- checks ---
+  admin:
+    name: Admin — lint + build
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: admin } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '22', cache: npm, cache-dependency-path: admin/package-lock.json }
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run build
+
+  client:
+    name: Client portal — lint + build
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: client } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '22', cache: npm, cache-dependency-path: client/package-lock.json }
+      # shared/site.js is git-ignored (real data); checks use the public template.
+      - run: cp ../shared/site.example.js ../shared/site.js
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run build
+
+  frontend:
+    name: Public site — build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '22', cache: npm, cache-dependency-path: package-lock.json }
+      - run: cp shared/site.example.js shared/site.js
+      - run: npm ci --workspace=Frontend
+      - run: npm run build --workspace=Frontend
+
+  backend:
+    name: API — install + Prisma + syntax
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        # Node 24 runs the generated TypeScript Prisma client by stripping types.
+        with: { node-version: '24', cache: npm, cache-dependency-path: package-lock.json }
+      - run: cp shared/site.example.js shared/site.js
+      - run: npm ci --workspace=Backend --workspace=database
+      # A broken schema.prisma is caught here, not when the Docker image builds.
+      - name: Generate Prisma client
+        working-directory: database
+        run: DATABASE_URL="mysql://ci:ci@localhost:3306/ci" npx prisma generate
+      # There are no real tests yet; `node --check` at least blocks a file with a syntax error, which is
+      # exactly what would crash the container on start. Replace with `npm test` when tests exist.
+      - name: Check syntax of every .js
+        run: |
+          find Backend -name node_modules -prune -o -name '*.js' -print | xargs -r -n1 node --check
+          echo "Syntax OK"
+      - name: Import the app (catches bad imports / missing exports)
+        working-directory: Backend
+        env:
+          JWT_SECRET: ci-only-not-a-secret-ci-only-not-a-secret
+          DATABASE_URL: mysql://ci:ci@localhost:3306/ci
+        run: node -e "import('./app.js').then(() => process.exit(0)).catch((e) => { console.error(e); process.exit(1); })"
+
+  # ------------------------------------------------------------ build+push ---
+  build-and-push:
+    name: Build and publish — ${{ matrix.image }}
+    needs: [admin, client, frontend, backend]
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - { image: api,    context: '.',     dockerfile: Backend/Dockerfile }
+          - { image: web,    context: '.',     dockerfile: Frontend/Dockerfile }
+          - { image: admin,  context: '.',     dockerfile: admin/Dockerfile }
+          - { image: client, context: '.',     dockerfile: client/Dockerfile }
+    outputs:
+      tag: ${{ steps.meta.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v4
+
+      # One tag per commit makes an exact rollback possible: ./rollout.sh sha-<previous commit>
+      - name: Compute tag
+        id: meta
+        run: echo "tag=sha-${GITHUB_SHA::12}" >> "$GITHUB_OUTPUT"
+
+      # The real shared/site.js is git-ignored; it reaches the images through a secret. Without the
+      # secret the images are built with the example data.
+      - name: Write shared/site.js
+        env:
+          SITE_JS_B64: ${{ secrets.SITE_JS_B64 }}
+        run: |
+          if [ -n "$SITE_JS_B64" ]; then
+            echo "$SITE_JS_B64" | base64 -d > shared/site.js
+            echo "shared/site.js: real data from SITE_JS_B64"
+          else
+            cp shared/site.example.js shared/site.js
+            echo "::warning::SITE_JS_B64 not set — images carry the EXAMPLE contact data"
+          fi
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # VITE_*/PUBLIC_* are baked at build time (the bundlers don't read them at runtime), so they go in
+      # as build-args. Changing the domain therefore needs a rebuild (a new push, or "Run workflow").
+      - name: Build + push
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ matrix.context }}
+          file: ${{ matrix.dockerfile }}
+          push: true
+          build-args: |
+            VITE_SITE_URL=https://${{ vars.APP_DOMAIN }}
+            PUBLIC_SITE_URL=https://${{ vars.APP_DOMAIN }}
+            PUBLIC_INDEXABLE=${{ vars.PUBLIC_INDEXABLE || 'false' }}
+          tags: |
+            ${{ env.IMAGE_PREFIX }}-${{ matrix.image }}:${{ steps.meta.outputs.tag }}
+            ${{ env.IMAGE_PREFIX }}-${{ matrix.image }}:latest
+          cache-from: type=gha,scope=${{ matrix.image }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.image }}
+
+  # ---------------------------------------------------------------- deploy ---
+  rollout:
+    name: Deploy on the server
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write # tailscale/github-action asks for the OIDC token
+    steps:
+      - name: Connect to Tailscale
+        uses: tailscale/github-action@v3
+        with:
+          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+          oauth-secret:    ${{ secrets.TS_OAUTH_SECRET }}
+          tags:            tag:ci
+          version:         latest
+
+      # Reachability test before SSH: if the Tailscale ACL doesn't let tag:ci reach the server, the
+      # error shows here instead of as an opaque SSH timeout.
+      - name: Check the server is reachable
+        run: |
+          echo "Runner on the tailnet as: $(tailscale ip -4)"
+          nc -z -w 10 "${{ secrets.SSH_HOST }}" "${{ secrets.SSH_PORT }}" \
+            || { echo "::error::Server unreachable over Tailscale. Check the ACL (tag:ci → server:${{ secrets.SSH_PORT }})."; exit 1; }
+
+      - name: Trigger the rollout over SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host:     ${{ secrets.SSH_HOST }}   # Tailscale address, never the public IP
+          username: ${{ secrets.SSH_USER }}
+          port:     ${{ secrets.SSH_PORT }}
+          key:      ${{ secrets.SSH_PRIVATE_KEY }}
+          timeout:  30s
+          command_timeout: 15m
+          # The script lives on the server, not here: CI doesn't decide WHAT runs, it can only trigger it.
+          # The key is bound to a forced command (/usr/local/bin/pba-deploy-trigger) that extracts the
+          # tag and discards everything else.
+          script: deploy ${{ needs.build-and-push.outputs.tag }}

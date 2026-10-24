@@ -3,8 +3,10 @@
 Contratos, especificaciones y planes del código. Para el estado actual y por dónde empezar:
 [`../handoff.md`](../handoff.md). Para el porqué de cada decisión: [`../wiki/`](../wiki/README.md).
 
-## Publicación
+## Publicación y despliegue
 - [`publicacion.md`](publicacion.md) — qué va a GitHub y qué se queda local (incluye la bitácora)
+- [`derechos-imagenes.md`](derechos-imagenes.md) — la única imagen publicada y su copyright
+- [`deploy.md`](deploy.md) — despliegue en el servidor `grid`, cambio de dominio y de servidor
 
 ## API (contratos)
 - [`api-overview.md`](api-overview.md) — `/api/admin/overview`

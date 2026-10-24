@@ -1,0 +1,13 @@
+---
+// The brand logo. Which file it shows is set in shared/brand.js (one place for every app).
+// The landing has no dark theme, so it always uses the dark-ink file. Size it with `class` (a height).
+import { LOGO } from "@shared/brand";
+import { BRAND } from "@shared/site";
+
+const files = import.meta.glob("../../../shared/brand/*.png", { eager: true, query: "?url", import: "default" });
+const src = Object.entries(files).find(([key]) => key.endsWith(`/shared/${LOGO.onLight}`))?.[1] as string;
+
+const { class: className = "h-24 w-auto" } = Astro.props;
+---
+
+<img src={src} alt={BRAND.name} class={className} />

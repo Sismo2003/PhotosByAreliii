@@ -1,0 +1,49 @@
+---
+// Shared <head>: unique title/description per page, canonical, Open Graph and LocalBusiness JSON-LD.
+// All business data comes from shared/site.js (skills site-config + landing-seo), never typed here.
+import "../styles.css";
+import { BRAND, CONTACT, SOCIAL } from "@shared/site";
+
+interface Props {
+  title: string;
+  description: string;
+}
+
+const { title, description } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const fullTitle = `${title} | ${BRAND.name}`;
+// The temporary domain must not be indexed; flip PUBLIC_INDEXABLE=true when the official one is live.
+const indexable = import.meta.env.PUBLIC_INDEXABLE === "true";
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "PhotographyBusiness",
+  name: BRAND.name,
+  url: Astro.site?.href,
+  telephone: CONTACT.phoneE164 || undefined,
+  email: CONTACT.emails?.primary || undefined,
+  sameAs: Object.values(SOCIAL).filter((v) => typeof v === "string" && v.startsWith("http")),
+};
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta name="robots" content={indexable ? "index, follow" : "noindex, nofollow"} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={BRAND.name} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

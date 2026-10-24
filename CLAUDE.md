@@ -33,3 +33,13 @@ Empieza por `handoff.md`.
   Nada de listas con grids a mano ni paginadores estáticos.
 - Todo componente que espere datos muestra **`Skeleton`** (`components/ui`, el de REACT-COMPONETS) con la
   forma del contenido; nunca texto "Loading…" ni huecos en blanco. Spinners solo en botones/acciones.
+
+## Despliegue: solo por CI/CD, siempre por Tailscale
+
+- Producción corre en el servidor `grid` y se despliega **únicamente** con push a `main` → GitHub Actions →
+  ghcr.io → rollout (skill **`deploy`**, `docs/deploy.md`). Las imágenes se construyen en CI, **nunca en el servidor**.
+  La conexión al servidor es siempre por Tailscale.
+- No tocar `deploy/.env` ni `Backend/.env` del servidor desde el repo; el dominio y el servidor son variables
+  (`APP_DOMAIN`, `SSH_HOST`), no valores en el código.
+- Un `git push` (y por tanto un deploy) lo decide el dueño: skill **`git-workflow`**.
+- `shared/site.js` (datos reales) está ignorado por git; la plantilla pública es `shared/site.example.js`.

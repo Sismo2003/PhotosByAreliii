@@ -14,8 +14,9 @@ import { destinationFor, useAuth } from "app/auth";
 import { GoTo } from "app/guards";
 import { SplashScreen } from "app/layout/SplashScreen";
 import { LanguageSwitch } from "components/LanguageSwitch";
+import { Logo } from "components/Logo";
 import { useDocumentTitle } from "hooks/useDocumentTitle";
-import { APP_NAME, REDIRECT_URL_KEY, SITE_URL } from "constants/app.constant";
+import { REDIRECT_URL_KEY, SITE_URL } from "constants/app.constant";
 import { isValidPhone } from "utils/phone";
 import { formatIdentifierInput, identifierKind } from "utils/identifier";
 
@@ -108,7 +109,7 @@ export default function SignIn() {
 
       <div className="flex flex-col px-4 pt-[calc(var(--safe-top)+2rem)] pb-[calc(var(--safe-bottom)+2rem)] sm:px-12 lg:px-[72px] lg:py-9">
         <div className="flex items-center justify-between gap-4">
-          <span className="wordmark text-ink">{APP_NAME}</span>
+          <Logo className="h-12" />
           <div className="flex items-center gap-5">
             <LanguageSwitch />
             <a href={SITE_URL} className="caps hidden text-ink-muted hover:text-ink sm:inline">

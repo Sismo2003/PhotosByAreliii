@@ -12,6 +12,10 @@ Este repositorio es público y no contiene datos reales de clientes, fotos ni cr
   teléfonos reales, fotos, archivos grandes).
 - **Contraseñas** con Argon2; sesiones con JWT en cookie; el cliente solo ve sus propias galerías
   (`Backend/middlewares/client-scope.middleware.js`). Ver skill `auth-gallery`.
+- **Despliegue:** solo por CI/CD; el servidor se alcanza únicamente por Tailscale (SSH no está expuesto). La llave de
+  CI está atada a un *forced command* que solo acepta un tag de versión, y el usuario del bot no está en el grupo
+  `docker`. Los contenedores corren sin root, con sistema de archivos de solo lectura y MySQL sin puerto publicado
+  ([`docs/deploy.md`](docs/deploy.md)).
 - Los datos de ejemplo usan `example.com` y teléfonos `(480) 555-01xx`.
 
 ## Reportar una vulnerabilidad
