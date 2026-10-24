@@ -1,0 +1,579 @@
+// photosByArelli — generated from database/prisma/schema.prisma (then schema.draft.prisma) (2026-10-02)
+// Paste into https://dbdiagram.io/d
+
+Project photosByArelli {
+  database_type: 'MySQL'
+  Note: 'Money in cents (int). Dates in UTC; studio runs on America/Phoenix.'
+}
+
+// ─── Enums ─────────────────────────────────────────────
+
+enum Role {
+  ADMIN
+  CLIENT
+}
+enum HeardFrom {
+  INSTAGRAM
+  FRIEND
+  GOOGLE
+  TIKTOK
+  RETURNING_CLIENT
+  OTHER
+}
+enum PartySize {
+  JUST_ME
+  TWO
+  THREE_TO_FIVE
+  SIX_TO_EIGHT
+}
+enum BookingSource {
+  WEBSITE
+  MANUAL
+}
+enum BookingStatus {
+  REQUEST
+  AWAITING_DEPOSIT
+  CONFIRMED
+  DECLINED
+  CANCELLED
+  EXPIRED
+}
+enum LocationKind {
+  PRESET
+  CAMPUS
+  STUDIO
+  OTHER
+}
+enum CancelReason {
+  CLIENT_REQUEST
+  WEATHER
+  PHOTOGRAPHER_UNAVAILABLE
+  NO_DEPOSIT
+  NO_SHOW
+}
+enum SharePermission {
+  YES
+  PARTIAL
+  NO
+}
+enum ReviewStatus {
+  NONE
+  REQUESTED
+  RECEIVED
+}
+enum PaymentMethod {
+  ZELLE
+  CASH_APP
+  CASH
+}
+enum PaymentKind {
+  DEPOSIT
+  BALANCE
+  REFUND
+}
+enum RebookKind {
+  SIX_MONTHS_FAMILY
+  ONE_YEAR_ANNIVERSARY_BIRTHDAY
+  NEXT_SPRING_GRADUATION
+  NEWBORN
+  CUSTOM
+}
+enum GalleryStatus {
+  DRAFT
+  DELIVERED
+}
+enum CoverLayout {
+  FULL
+  SPLIT
+  MINIMAL
+}
+enum DownloadMode {
+  HIGH_AND_WEB
+  WEB_ONLY
+  OFF
+}
+enum GalleryPrivacy {
+  CLIENT_LOGIN
+  PASSWORD
+  PUBLIC_LINK
+}
+enum ClientMatch {
+  NEW
+  EMAIL
+  PHONE
+  BOTH
+  CONFLICT
+}
+
+enum StorageLevel {
+  OK
+  LOW
+  CRITICAL
+  FULL
+}
+
+enum EmailStatus {
+  PENDING
+  SENDING
+  SENT
+  FAILED
+  CANCELLED
+  SKIPPED
+}
+
+enum ActorType {
+  ADMIN
+  CLIENT
+  SYSTEM
+}
+enum ServiceStatus {
+  LIVE
+  HIDDEN
+  DRAFT
+}
+
+// ─── Catalog ───────────────────────────────────────────
+
+Table services {
+  id int [pk, increment]
+  slug varchar [unique]
+  name varchar
+  status ServiceStatus [default: 'DRAFT']
+  cardLine varchar [null]
+  intro text [null]
+  includesLine varchar [null]
+  ctaWord varchar [null, note: 'Ready for your ___ photos?']
+  fromPackageId int [null, unique, note: '"from" price']
+  position int [default: 0]
+  createdAt datetime
+  updatedAt datetime
+}
+
+Table packages {
+  id int [pk, increment]
+  serviceId int
+  name varchar
+  priceCents int
+  durationMinutes int
+  photoCount int [null]
+  outfits int [null]
+  maxPeople int [null]
+  sessionCount int [default: 1]
+  customDescription varchar [null]
+  isFeatured boolean [default: false, note: 'Most booked']
+  hidden boolean [default: false]
+  position int [default: 0]
+  createdAt datetime
+  updatedAt datetime
+  indexes { (serviceId, name) [unique] }
+}
+
+Table extras {
+  id int [pk, increment]
+  name varchar [unique]
+  priceCents int
+  active boolean [default: true]
+  position int [default: 0]
+}
+
+Table extra_services {
+  extraId int
+  serviceId int
+  indexes { (extraId, serviceId) [pk] }
+}
+
+// ─── People ────────────────────────────────────────────
+
+Table clients {
+  id int [pk, increment]
+  displayName varchar
+  firstName varchar [null]
+  lastName varchar [null]
+  email varchar [unique]
+  phone varchar [null, note: 'as typed']
+  phoneE164 varchar [null, unique, note: '+14805550100 — second identifier']
+  instagram varchar [null]
+  heardFrom HeardFrom [null]
+  privateNotes text [null]
+  locale varchar [default: 'en']
+  emailBouncedAt datetime [null]
+  createdAt datetime [note: 'Client since']
+  updatedAt datetime
+}
+
+Table users {
+  id int [pk, increment]
+  email varchar [unique]
+  passwordHash varchar [note: 'argon2']
+  role Role [default: 'CLIENT']
+  clientId int [null, unique, note: 'null for ADMIN']
+  mustChangePassword boolean [default: false]
+  passwordChangedAt datetime [null, note: 'sessions issued before this are rejected']
+  invitedAt datetime [null]
+  lastLoginAt datetime [null]
+  createdAt datetime
+  updatedAt datetime
+}
+
+Table password_reset_tokens {
+  id int [pk, increment]
+  userId int
+  tokenHash varchar [unique]
+  expiresAt datetime
+  usedAt datetime [null]
+  createdAt datetime
+}
+
+// ─── Bookings & money ──────────────────────────────────
+
+Table bookings {
+  id int [pk, increment]
+  code varchar [unique, note: 'PBA-0151']
+  clientId int
+  source BookingSource [default: 'WEBSITE']
+  status BookingStatus [default: 'REQUEST']
+  serviceId int
+  packageId int [null]
+  serviceNameSnapshot varchar
+  packageNameSnapshot varchar [null]
+  packagePriceCents int
+  durationMinutes int
+  startsAt datetime
+  locationKind LocationKind
+  locationName varchar
+  locationAddress varchar [null]
+  travelFeeCents int [default: 0]
+  adjustmentCents int [default: 0]
+  totalCents int
+  depositCents int
+  contactFirstName varchar [null, note: 'as typed in /book']
+  contactLastName varchar [null]
+  contactEmail varchar [null]
+  contactPhone varchar [null]
+  clientMatchedBy ClientMatch [default: 'NEW']
+  matchReviewedAt datetime [null]
+  partySize PartySize [null]
+  schoolAndColors varchar [null]
+  clientNotes text [null]
+  privateNotes text [null]
+  inspo text [null]
+  photosNeededBy date [null]
+  sharePermission SharePermission [null]
+  doNotPostNotes text [null]
+  minorConsentAt datetime [null]
+  policyAcceptedAt datetime [null]
+  confirmedAt datetime [null]
+  depositDueAt datetime [null]
+  declinedAt datetime [null]
+  cancelledAt datetime [null]
+  cancelReason CancelReason [null]
+  depositRefunded boolean [null]
+  expiredAt datetime [null]
+  rescheduleCount int [default: 0]
+  thanksSentAt datetime [null]
+  reviewStatus ReviewStatus [default: 'NONE']
+  reviewRequestedAt datetime [null]
+  reviewReceivedAt datetime [null]
+  archivedAt datetime [null]
+  createdAt datetime
+  updatedAt datetime
+  indexes {
+    clientId
+    (status, startsAt)
+    startsAt
+  }
+}
+
+Table booking_extras {
+  bookingId int
+  extraId int
+  nameSnapshot varchar
+  priceCentsSnapshot int
+  indexes { (bookingId, extraId) [pk] }
+}
+
+Table payments {
+  id int [pk, increment]
+  bookingId int
+  kind PaymentKind
+  method PaymentMethod
+  amountCents int [note: 'always positive; REFUND subtracts']
+  receivedAt datetime
+  note varchar [null]
+  recordedById int [null]
+  createdAt datetime
+}
+
+Table rebook_reminders {
+  id int [pk, increment]
+  clientId int
+  bookingId int [null]
+  kind RebookKind
+  label varchar
+  dueOn date
+  doneAt datetime [null]
+  createdAt datetime
+}
+
+// ─── Galleries ─────────────────────────────────────────
+
+Table galleries {
+  id int [pk, increment]
+  slug varchar [unique, note: '/g/emily-tran']
+  title varchar
+  clientId int
+  bookingId int [null, unique]
+  status GalleryStatus [default: 'DRAFT']
+  deliveredAt datetime [null]
+  expiresAt datetime [null]
+  expiryReminderSentAt datetime [null, note: '48 h warning']
+  photosDeletedAt datetime [null, note: 'photos removed at expiry (D9)']
+  coverPhotoId int [null, unique]
+  coverLayout CoverLayout [default: 'FULL']
+  downloadMode DownloadMode [default: 'HIGH_AND_WEB']
+  pinRequired boolean [default: true]
+  downloadPinEnc varchar [null, note: 'AES-256-GCM']
+  privacy GalleryPrivacy [default: 'CLIENT_LOGIN']
+  accessPasswordEnc varchar [null, note: 'AES-256-GCM']
+  favoritesEnabled boolean [default: true]
+  favoritesLimit int [null]
+  watermark boolean [default: false]
+  socialSharing boolean [default: false]
+  deliverySubject varchar [null]
+  deliveryMessage text [null]
+  deliveredToEmail varchar [null]
+  createdAt datetime
+  updatedAt datetime
+}
+
+Table gallery_sets {
+  id int [pk, increment]
+  galleryId int
+  name varchar
+  position int [default: 0]
+  indexes { (galleryId, name) [unique] }
+}
+
+Table photos {
+  id int [pk, increment]
+  galleryId int
+  setId int [null]
+  originalFilename varchar
+  mimeType varchar
+  sizeBytes int
+  width int [null]
+  height int [null]
+  originalPath varchar [note: 'never served statically']
+  webPath varchar
+  thumbnailPath varchar
+  position int [default: 0]
+  hidden boolean [default: false]
+  uploadedAt datetime
+}
+
+Table favorites {
+  clientId int
+  photoId int
+  createdAt datetime
+  indexes { (clientId, photoId) [pk] }
+  Note: 'Only for galleries with privacy = CLIENT_LOGIN'
+}
+
+// ─── Activity, settings, availability ──────────────────
+
+Table activity_events {
+  id int [pk, increment]
+  type varchar [note: 'e.g. booking.confirmed']
+  actorType ActorType
+  actorId int [null]
+  clientId int [null]
+  bookingId int [null]
+  galleryId int [null]
+  message varchar
+  metadata json [null]
+  createdAt datetime
+}
+
+Table studio_settings {
+  id int [pk, default: 1, note: 'single row']
+  depositPercent int [default: 50]
+  cancelNoticeHours int [default: 48]
+  lateGraceMinutes int [default: 30]
+  maxReschedules int [default: 1]
+  outfitChangeCents int [default: 1500]
+  depositDueHours int [default: 48]
+  replyWithinHours int [default: 24]
+  galleryDeliveryDays int [default: 14]
+  galleryExpiryDays int [default: 90]
+  expiryReminderHours int [default: 48]
+  depositReminderHours int [default: 12]
+  prepReminderHours int [default: 48]
+  reviewUrl varchar [null]
+  galleryExtendDays int [default: 30]
+  freeTravelMiles int [default: 25]
+  travelFeePerMileCents int [default: 100]
+  zelleHandle varchar [null]
+  cashAppHandle varchar [null]
+  defaultDownloadMode DownloadMode [default: 'HIGH_AND_WEB']
+  defaultPinRequired boolean [default: true]
+  defaultPrivacy GalleryPrivacy [default: 'CLIENT_LOGIN']
+  defaultFavoritesLimit int [null, default: 20]
+  defaultWatermark boolean [default: false]
+  defaultSocialSharing boolean [default: false]
+  bookingPolicyText text [null]
+  bookingPolicyVersion int [default: 1]
+  storageAlertLevel StorageLevel [default: 'OK']
+  storageAlertSentAt datetime [null]
+  mailStorageAlertLevel StorageLevel [default: 'OK']
+  mailStorageAlertSentAt datetime [null]
+  updatedAt datetime
+}
+
+Table availability_slots {
+  id int [pk, increment]
+  weekday int [note: '0 = Sunday']
+  startTime varchar [note: '17:15 Phoenix time']
+  label varchar [null]
+  active boolean [default: true]
+  indexes { (weekday, startTime) [unique] }
+}
+
+Table blocked_dates {
+  id int [pk, increment]
+  date date [unique]
+  reason varchar [null]
+}
+
+Table email_outbox {
+  id int [pk, increment]
+  key varchar [note: 'booking.confirmed']
+  templateVersionId int [null]
+  toEmail varchar
+  toName varchar [null]
+  locale varchar [default: 'en']
+  data json [note: 'never secrets']
+  secretsEnc text [null, note: 'AES-256-GCM; nulled once sent']
+  subject varchar [null]
+  dedupeKey varchar [null, unique]
+  status EmailStatus [default: 'PENDING']
+  skipReason varchar [null]
+  isTest boolean [default: false]
+  sendAfter datetime
+  attempts int [default: 0]
+  nextAttemptAt datetime
+  lastError text [null]
+  messageId varchar [null, unique]
+  emlPath varchar [null, note: 'copy in the mail archive']
+  sizeBytes int [null]
+  bouncedAt datetime [null]
+  clientId int [null]
+  bookingId int [null]
+  galleryId int [null]
+  createdAt datetime
+  sentAt datetime [null]
+  indexes {
+    (status, sendAfter, nextAttemptAt)
+    (clientId, createdAt)
+    bookingId
+    galleryId
+    createdAt
+  }
+}
+
+Table email_templates {
+  id int [pk, increment]
+  key varchar
+  locale varchar [note: 'en | es']
+  draftSubject varchar [null]
+  draftMjml mediumtext [null]
+  draftProject json [null, note: 'GrapesJS project']
+  draftUpdatedAt datetime [null]
+  publishedVersionId int [null, unique]
+  isDefault boolean [default: true]
+  createdAt datetime
+  updatedAt datetime
+  indexes { (key, locale) [unique] }
+  Note: 'On/off switches live in settings.json'
+}
+
+Table email_template_versions {
+  id int [pk, increment]
+  templateId int
+  version int
+  subject varchar
+  mjml mediumtext
+  project json [null]
+  html mediumtext [note: 'compiled + sanitized']
+  publishedAt datetime
+  publishedById int [null]
+  indexes { (templateId, version) [unique] }
+}
+
+Table email_inbound {
+  id int [pk, increment]
+  folder varchar [default: 'INBOX']
+  uidValidity bigint
+  uid int
+  messageId varchar [null]
+  inReplyTo varchar [null]
+  fromEmail varchar
+  fromName varchar [null]
+  toEmail varchar [null]
+  subject varchar [null]
+  snippet varchar [null]
+  receivedAt datetime
+  sizeBytes int
+  emlPath varchar [null]
+  attachments json [null]
+  isBounce boolean [default: false]
+  bounceOutboxId int [null]
+  readAt datetime [null]
+  clientId int [null]
+  deletedOnServerAt datetime [null]
+  createdAt datetime
+  indexes {
+    (folder, uidValidity, uid) [unique]
+    receivedAt
+    (clientId, receivedAt)
+  }
+}
+
+// ─── Relationships ─────────────────────────────────────
+
+Ref: packages.serviceId > services.id [delete: restrict]
+Ref: services.fromPackageId - packages.id [delete: set null]
+Ref: extra_services.extraId > extras.id [delete: cascade]
+Ref: extra_services.serviceId > services.id [delete: cascade]
+
+Ref: users.clientId - clients.id
+Ref: password_reset_tokens.userId > users.id [delete: cascade]
+
+Ref: bookings.clientId > clients.id
+Ref: bookings.serviceId > services.id [delete: restrict]
+Ref: bookings.packageId > packages.id [delete: restrict]
+Ref: booking_extras.bookingId > bookings.id [delete: cascade]
+Ref: booking_extras.extraId > extras.id [delete: restrict]
+Ref: payments.bookingId > bookings.id
+Ref: rebook_reminders.clientId > clients.id [delete: cascade]
+Ref: rebook_reminders.bookingId > bookings.id
+
+Ref: galleries.clientId > clients.id
+Ref: galleries.bookingId - bookings.id
+Ref: galleries.coverPhotoId - photos.id [delete: set null]
+Ref: gallery_sets.galleryId > galleries.id [delete: cascade]
+Ref: photos.galleryId > galleries.id [delete: cascade]
+Ref: photos.setId > gallery_sets.id [delete: set null]
+Ref: favorites.clientId > clients.id [delete: cascade]
+Ref: favorites.photoId > photos.id [delete: cascade]
+
+Ref: activity_events.clientId > clients.id [delete: cascade]
+Ref: activity_events.bookingId > bookings.id [delete: cascade]
+Ref: activity_events.galleryId > galleries.id [delete: cascade]
+
+Ref: email_outbox.clientId > clients.id [delete: set null]
+Ref: email_outbox.bookingId > bookings.id [delete: set null]
+Ref: email_outbox.galleryId > galleries.id [delete: set null]
+Ref: email_outbox.templateVersionId > email_template_versions.id [delete: set null]
+Ref: email_template_versions.templateId > email_templates.id [delete: cascade]
+Ref: email_templates.publishedVersionId - email_template_versions.id [delete: set null]
+Ref: email_inbound.clientId > clients.id [delete: set null]

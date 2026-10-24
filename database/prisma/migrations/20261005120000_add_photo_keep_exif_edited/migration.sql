@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE `photos` ADD COLUMN `keep` BOOLEAN NOT NULL DEFAULT false,
+    ADD COLUMN `exif` JSON NULL,
+    ADD COLUMN `editedAt` DATETIME(3) NULL;

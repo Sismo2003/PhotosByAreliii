@@ -1,0 +1,323 @@
+@layer base, vendor, components, utilities;
+
+@import "./variants.css" layer(base);
+@import "./base.css" layer(base);
+
+@import "./components/input.css" layer(components);
+@import "./components/button.css" layer(components);
+@import "./components/skeleton.css" layer(components);
+
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+  MIRROR of admin/src/styles/index.css (@theme tokens, light/dark variables, type helpers).
+  Both portals must look the same: change the tokens in both files together
+  (docs/portal-cliente-plan.md §3, §9).
+
+  Photos By Areliii design system (Claude Design · PhotosByAreli tokens v2).
+  The template's gray / dark / primary scales are remapped to the brand tokens so every
+  Tailux component picks up the look without being rewritten:
+    gray-*   → light theme  (paper #fff, paper-alt #f6f5f3, line #e7e5e1, line-strong #8a8a8a,
+                             ink-muted #6e6e6e, ink #151515)
+    dark-*   → dark theme   (paper #0f0f0f, paper-alt #181818, line #2a2a2a, line-strong #6b6b6b,
+                             ink-muted #a3a3a3, ink #f2f2f0)
+    primary  → ink (black in light, off-white in dark — see variants.css for text on it)
+  No rounded corners anywhere (radius-none).
+*/
+@theme {
+  --font-sans: "EB Garamond", "Iowan Old Style", Garamond, Georgia, serif;
+  --font-serif: "EB Garamond", "Iowan Old Style", Garamond, Georgia, serif;
+
+  --text-tiny: 0.6875rem;
+  --text-tiny--line-height: 1rem;
+
+  --text-tiny-plus: 0.75rem;
+  --text-tiny-plus--line-height: 1rem;
+
+  --text-xs-plus: 0.875rem;
+  --text-xs-plus--line-height: 1.3125rem;
+
+  --text-sm-plus: 1rem;
+  --text-sm-plus--line-height: 1.5rem;
+
+  /* Type scale from the design system */
+  --text-title-l: 2.75rem; /* 44px */
+  --text-title-l--line-height: 1.1;
+  --text-title: 1.75rem; /* 28px */
+  --text-title--line-height: 1.2;
+  --text-body-l: 1.3125rem; /* 21px */
+  --text-body-l--line-height: 2rem;
+  --text-body: 1.0625rem; /* 17px */
+  --text-body--line-height: 1.6875rem;
+  --text-small: 0.875rem; /* 14px */
+  --text-small--line-height: 1.3125rem;
+  --text-caps: 0.75rem; /* 12px */
+  --text-caps--line-height: 1rem;
+
+  --tracking-caps: 0.14em;
+  --tracking-wordmark: 0.24em;
+
+  --radius-xs: 0;
+  --radius-sm: 0;
+  --radius-md: 0;
+  --radius-lg: 0;
+  --radius-xl: 0;
+  --radius-2xl: 0;
+  --radius-3xl: 0;
+  --radius-4xl: 0;
+  --radius: 0;
+
+  --shadow-soft: 0 1px 2px 0 rgb(21 21 21 / 0.06), 0 8px 24px -8px rgb(21 21 21 / 0.12);
+  --shadow-soft-dark: 0 3px 10px 0 rgb(0 0 0 / 40%);
+
+  --ease-elastic: cubic-bezier(0.53, 0.21, 0.29, 0.67);
+
+  --color-this-lighter: var(--this-lighter);
+  --color-this-light: var(--this-light);
+  --color-this: var(--this);
+  --color-this-darker: var(--this-darker);
+  --color-on-this: #ffffff;
+
+  --color-surface-1: var(--surface-1);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+
+  /* Brand tokens, usable directly: bg-paper, text-ink, border-line… */
+  --color-paper: var(--pba-paper);
+  --color-paper-alt: var(--pba-paper-alt);
+  --color-ink: var(--pba-ink);
+  --color-ink-muted: var(--pba-ink-muted);
+  --color-on-ink: var(--pba-on-ink);
+  --color-line: var(--pba-line);
+  --color-line-strong: var(--pba-line-strong);
+  --color-film: #111111;
+  --color-alert: var(--pba-alert);
+
+  /* Status colors. The brand is black & white; these only appear on the storage bar
+     (docs/almacenamiento-fotos.md §4.2) and on form errors (alert). */
+  --color-secondary-lighter: #8a8a8a;
+  --color-secondary-light: #6e6e6e;
+  --color-secondary: #3a3a3a;
+  --color-secondary-darker: #151515;
+
+  --color-info-lighter: #8a8a8a;
+  --color-info-light: #6e6e6e;
+  --color-info: #3a3a3a;
+  --color-info-darker: #151515;
+
+  --color-success-lighter: #5fa57a;
+  --color-success-light: #3d8c5c;
+  --color-success: #2f7d4a;
+  --color-success-darker: #23603a;
+
+  --color-warning-lighter: #e0a548;
+  --color-warning-light: #c98a2a;
+  --color-warning: #b7791f;
+  --color-warning-darker: #8f5e17;
+
+  --color-error-lighter: #f08a96;
+  --color-error-light: #c2414f;
+  --color-error: #9b2335;
+  --color-error-darker: #7a1b2a;
+
+  --border-width-3: 3px;
+
+  --z-index-1: 1;
+  --z-index-2: 2;
+  --z-index-3: 3;
+  --z-index-4: 4;
+  --z-index-5: 5;
+
+  --animate-shimmer: shimmer 2s linear infinite;
+
+  --color-gray-50: #faf9f8;
+  --color-gray-100: #f6f5f3;
+  --color-gray-150: #efeeeb;
+  --color-gray-200: #e7e5e1;
+  --color-gray-300: #d8d6d1;
+  --color-gray-400: #8a8a8a;
+  --color-gray-500: #6e6e6e;
+  --color-gray-600: #555555;
+  --color-gray-700: #2a2a2a;
+  --color-gray-800: #151515;
+  --color-gray-900: #151515;
+  --color-gray-950: #0f0f0f;
+
+  --color-dark-50: #f2f2f0;
+  --color-dark-100: #e0e0dd;
+  --color-dark-200: #c9c9c6;
+  --color-dark-300: #a3a3a3;
+  --color-dark-400: #6b6b6b;
+  --color-dark-450: #3a3a3a;
+  --color-dark-500: #2a2a2a;
+  --color-dark-600: #222222;
+  --color-dark-700: #1c1c1c;
+  --color-dark-750: #1a1a1a;
+  --color-dark-800: #181818;
+  --color-dark-900: #0f0f0f;
+
+  --color-primary-50: var(--pba-primary-50);
+  --color-primary-100: var(--pba-primary-100);
+  --color-primary-200: var(--pba-primary-200);
+  --color-primary-300: var(--pba-primary-300);
+  --color-primary-400: var(--pba-primary-400);
+  --color-primary-500: var(--pba-primary-500);
+  --color-primary-600: var(--pba-primary-600);
+  --color-primary-700: var(--pba-primary-700);
+  --color-primary-800: var(--pba-primary-800);
+  --color-primary-900: var(--pba-primary-900);
+  --color-primary-950: var(--pba-primary-950);
+
+  @keyframes shimmer {
+    from {
+      background-position: 0 0;
+    }
+    to {
+      background-position: -200% 0;
+    }
+  }
+}
+
+/* Light theme (default) */
+:root {
+  --pba-paper: #ffffff;
+  --pba-paper-alt: #f6f5f3;
+  --pba-ink: #151515;
+  --pba-ink-muted: #6e6e6e;
+  --pba-on-ink: #ffffff;
+  --pba-line: #e7e5e1;
+  --pba-line-strong: #8a8a8a;
+  --pba-alert: #9b2335;
+
+  --pba-primary-50: #f6f5f3;
+  --pba-primary-100: #e7e5e1;
+  --pba-primary-200: #d8d6d1;
+  --pba-primary-300: #8a8a8a;
+  --pba-primary-400: #3a3a3a;
+  --pba-primary-500: #2a2a2a;
+  --pba-primary-600: #151515;
+  --pba-primary-700: #000000;
+  --pba-primary-800: #000000;
+  --pba-primary-900: #000000;
+  --pba-primary-950: #000000;
+
+  /* Overview charts: an ink ramp (largest gallery darkest), then the neutrals for
+     "everything else" and "free". Monochrome like the rest of the admin. */
+  --pba-chart-1: #151515;
+  --pba-chart-2: #474745;
+  --pba-chart-3: #73726f;
+  --pba-chart-4: #9c9b97;
+  --pba-chart-5: #bfbdb8;
+  --pba-chart-rest: #d8d6d1;
+  --pba-chart-free: #f0efec;
+}
+
+/* Dark theme: ink becomes off-white, so "primary" flips too */
+html.dark {
+  --pba-paper: #0f0f0f;
+  --pba-paper-alt: #181818;
+  --pba-ink: #f2f2f0;
+  --pba-ink-muted: #a3a3a3;
+  --pba-on-ink: #0f0f0f;
+  --pba-line: #2a2a2a;
+  --pba-line-strong: #6b6b6b;
+  --pba-alert: #f08a96;
+
+  --pba-primary-50: #181818;
+  --pba-primary-100: #2a2a2a;
+  --pba-primary-200: #3a3a3a;
+  --pba-primary-300: #6b6b6b;
+  --pba-primary-400: #f2f2f0;
+  --pba-primary-500: #f2f2f0;
+  --pba-primary-600: #f2f2f0;
+  --pba-primary-700: #ffffff;
+  --pba-primary-800: #ffffff;
+  --pba-primary-900: #ffffff;
+  --pba-primary-950: #ffffff;
+
+  --pba-chart-1: #f2f2f0;
+  --pba-chart-2: #c4c4c1;
+  --pba-chart-3: #96968f;
+  --pba-chart-4: #6e6e69;
+  --pba-chart-5: #52524e;
+  --pba-chart-rest: #3a3a38;
+  --pba-chart-free: #1f1f1f;
+}
+
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
+  }
+}
+
+/* Design-system type helpers */
+@utility caps {
+  font-size: var(--text-caps);
+  line-height: var(--text-caps--line-height);
+  font-weight: 500;
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+}
+
+@utility wordmark {
+  font-size: 0.8125rem;
+  line-height: 1rem;
+  font-weight: 500;
+  letter-spacing: var(--tracking-wordmark);
+  text-transform: uppercase;
+}
+
+@utility field-label {
+  font-size: 0.6875rem;
+  line-height: 1rem;
+  font-weight: 500;
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  color: var(--pba-ink-muted);
+}
+
+/* Page transitions (Bookings list ⇄ booking page). Routes navigate with `viewTransition`; the
+   page container carries `page-vt`, so only the content fades/slides — sidebar and header stay put. */
+.page-vt {
+  view-transition-name: page;
+}
+
+::view-transition-group(page) {
+  animation: none;
+}
+
+::view-transition-old(page) {
+  animation: page-out 140ms ease-in both;
+}
+
+::view-transition-new(page) {
+  animation: page-in 260ms cubic-bezier(0.22, 1, 0.36, 1) 60ms both;
+}
+
+@keyframes page-out {
+  to {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes page-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(page),
+  ::view-transition-new(page) {
+    animation-duration: 1ms;
+    animation-delay: 0s;
+  }
+}

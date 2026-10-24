@@ -1,0 +1,7 @@
+# Context is the repo root: send only client/ and shared/.
+*
+!client
+!shared
+**/node_modules
+client/dist
+client/.env*.local

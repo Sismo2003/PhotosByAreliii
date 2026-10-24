@@ -1,0 +1,39 @@
+# Local development only: MySQL + Prisma (migrate / Studio). Production is deploy/docker-compose.yml.
+# Run from database/:  docker compose up -d --build
+name: pba-dev
+
+services:
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: photosbyarelli
+      MYSQL_USER: pba
+      MYSQL_PASSWORD: pba
+    ports: ["${MYSQL_PORT:-3306}:3306"]
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./docker/mysql-init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  # On start: prisma generate + migrate deploy, then Studio on http://localhost:5555.
+  # One-off commands: docker compose run --rm prisma npx prisma migrate dev --name <name>
+  prisma:
+    build: .
+    environment:
+      DATABASE_URL: mysql://pba:pba@mysql:3306/photosbyarelli
+      STUDIO_PORT: ${STUDIO_PORT:-5555}
+    ports: ["${STUDIO_PORT:-5555}:5555"]
+    volumes:
+      - .:/app
+      - /app/node_modules # the container's own Linux install, not the Mac's
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+volumes:
+  mysql-data:

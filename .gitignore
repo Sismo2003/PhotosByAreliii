@@ -1,0 +1,107 @@
+# photosByArelli — public repo. ALLOWLIST: everything is ignored unless listed below.
+# A new file is never published by accident; to publish something, add it explicitly.
+# Before committing, run: .claude/skills/git-workflow/check-secrets.sh
+
+# ── 1. Ignore everything at the root ────────────────────────────────────────
+/*
+
+# ── 2. Publishable (documented code + minimum to clone and run) ─────────────
+!/.gitignore
+!/README.md
+!/SECURITY.md
+!/CLAUDE.md
+!/handoff.md
+!/package.json
+!/package-lock.json
+!/Backend/
+!/Frontend/
+!/admin/
+!/client/
+!/database/
+!/deploy/
+!/shared/
+!/docs/
+!/wiki/
+
+# Project skills: only the ones listed (not the third-party/global ones, e.g. graphify)
+!/.claude/
+/.claude/*
+!/.claude/settings.json
+!/.claude/skills/
+/.claude/skills/*
+!/.claude/skills/README.md
+!/.claude/skills/admin-tables/
+!/.claude/skills/auth-gallery/
+!/.claude/skills/backend/
+!/.claude/skills/bitacora/
+!/.claude/skills/client-portal/
+!/.claude/skills/db-migrations/
+!/.claude/skills/frontend/
+!/.claude/skills/git-workflow/
+!/.claude/skills/landing-seo/
+!/.claude/skills/site-config/
+!/.claude/skills/workflow/
+
+# ── 3. Never, even inside the allowed folders (this block wins) ─────────────
+# Secrets and local config
+.env
+.env.*
+!.env.example
+# dev-only localhost origins, no secrets (checked)
+!admin/.env.development
+!client/.env.development
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+id_rsa*
+*.secret
+*secret*.txt
+pass-temp*
+# Real business data (template: shared/site.example.js)
+shared/site.js
+*password*.txt
+*.token
+.claude/settings.local.json
+
+# Dependencies, builds, generated code
+node_modules/
+dist/
+build/
+coverage/
+.astro/
+.vite/
+database/generated/
+
+# Runtime data: photos, uploads, dumps, databases
+Backend/storage/
+Backend/uploads/
+*.sql.gz
+*.dump
+*.sqlite
+*.sqlite3
+*.db
+*.log
+
+# Photos and business documents (real clients / brand — kept local)
+*.jpg
+*.jpeg
+*.png
+*.webp
+*.heic
+*.gif
+*.pdf
+*.docx
+*.xlsx
+*.zip
+# …except the app favicons
+!admin/public/favicon.png
+!client/public/favicon.png
+
+# Scratch / OS / editor
+_t*.mjs
+graphify-out/
+.DS_Store
+.idea/
+.vscode/

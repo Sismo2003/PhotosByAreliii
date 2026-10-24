@@ -1,0 +1,40 @@
+/* Client portal base — same body/typography as admin/src/styles/base.css, plus what a
+   phone-first app needs (safe areas for the bottom tab bar, no tap flash). */
+html {
+  @apply h-full [--surface-1:var(--color-dark-450)] [--surface-2:var(--color-dark-500)] [--surface-3:var(--color-dark-600)] [-webkit-tap-highlight-color:transparent] [text-rendering:optimizeLegibility];
+}
+
+html.dark {
+  @apply [color-scheme:dark];
+}
+
+body {
+  @apply min-h-full bg-paper font-sans text-body text-ink antialiased dark:bg-dark-900 dark:text-dark-200;
+  overscroll-behavior-y: none;
+}
+
+.min-h-100vh {
+  min-height: 100vh;
+}
+
+@supports (height: 100dvh) {
+  .min-h-100vh {
+    min-height: 100dvh;
+  }
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Bottom tab bar height + the iPhone home indicator. Pages pad their bottom with this. */
+:root {
+  --tabbar-h: 3.5rem;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-top: env(safe-area-inset-top, 0px);
+}

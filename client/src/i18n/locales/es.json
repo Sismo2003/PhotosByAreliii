@@ -1,0 +1,330 @@
+{
+  "nav": {
+    "label": "Principal",
+    "galleries": "Galerías",
+    "profile": "Perfil",
+    "bookings": "Sesiones",
+    "payments": "Pagos"
+  },
+  "language": {
+    "label": "Idioma"
+  },
+  "signIn": {
+    "title": "Iniciar sesión",
+    "subtitle": "Mira y descarga tus fotos. Usa el correo o el teléfono que Areli tiene registrado.",
+    "photoAlt": "Una pareja caminando hacia las Superstition Mountains, con un pequeño mameluco entre ellos",
+    "backToSite": "← Volver al sitio",
+    "identifier": "Correo o teléfono",
+    "identifierPlaceholder": "tu@correo.com o (480) 555-0123",
+    "password": "Contraseña",
+    "show": "Ver",
+    "hide": "Ocultar",
+    "showPassword": "Mostrar contraseña",
+    "hidePassword": "Ocultar contraseña",
+    "submit": "Entrar",
+    "submitting": "Entrando…",
+    "forgot": "¿Olvidaste tu contraseña? Mándale un mensaje a Areli y te enviará una nueva.",
+    "errors": {
+      "identifierRequired": "Escribe tu correo o teléfono.",
+      "passwordRequired": "Escribe tu contraseña.",
+      "wrong": "El correo o teléfono y la contraseña no coinciden.",
+      "tooMany": "Demasiados intentos. Vuelve a intentarlo en unos minutos.",
+      "sessionEnded": "Tu sesión terminó. Vuelve a iniciar sesión.",
+      "phoneInvalid": "Escribe un teléfono completo, como (480) 555-0123.",
+      "emailInvalid": "Escribe un correo válido, como tu@correo.com."
+    }
+  },
+  "password": {
+    "title": "Elige tu contraseña",
+    "subtitle": "Elige tu propia contraseña para ver tus fotos. La usarás de ahora en adelante.",
+    "new": "Contraseña nueva",
+    "repeat": "Repite la contraseña nueva",
+    "rulesLabel": "Reglas de la contraseña",
+    "met": "— cumplida",
+    "notMet": "— aún no",
+    "save": "Guardar contraseña",
+    "saving": "Guardando…",
+    "rules": {
+      "length": "Más de 8 caracteres",
+      "uppercase": "Al menos 1 letra mayúscula",
+      "number": "Al menos 1 número",
+      "noName": "No contiene tu nombre ni tu apellido",
+      "match": "Las dos contraseñas coinciden"
+    },
+    "errors": {
+      "sameAsTemporary": "Elige una contraseña distinta a la que te enviamos.",
+      "alreadyChosen": "Tu contraseña ya fue elegida. Inicia sesión con ella."
+    }
+  },
+  "galleries": {
+    "title": "Tus galerías",
+    "hello": "Hola, {{name}}",
+    "photoCount_one": "{{count}} foto",
+    "photoCount_other": "{{count}} fotos",
+    "daysLeft_one": "Queda {{count}} día",
+    "daysLeft_other": "Quedan {{count}} días",
+    "lastDay": "Último día",
+    "draft": "Borrador",
+    "expiredOn": "Venció el {{date}}",
+    "expiredNote": "Estas galerías vencieron y sus fotos se eliminaron. Escríbele a Areli si necesitas algo de ellas.",
+    "filters": {
+      "available": "Disponibles",
+      "showExpired": "Vencidas ({{count}})"
+    },
+    "empty": {
+      "title": "Aún no hay galerías",
+      "body": "Tus fotos aparecerán aquí en cuanto Areli las entregue. Te avisaremos por correo."
+    }
+  },
+  "gallery": {
+    "back": "Volver a galerías",
+    "allPhotos": "Todas",
+    "sets": "Secciones",
+    "photos_one": "{{count}} foto",
+    "photos_other": "{{count}} fotos",
+    "availableUntil": "Disponible hasta el {{date}}",
+    "expiresToday": "Esta galería cierra hoy. Guarda las fotos que quieras conservar.",
+    "expiresSoon_one": "Esta galería cierra mañana ({{date}}). Guarda las fotos que quieras conservar.",
+    "expiresSoon_other": "Esta galería cierra en {{count}} días ({{date}}). Guarda las fotos que quieras conservar.",
+    "favorites": "Favoritas",
+    "select": "Seleccionar",
+    "cancelSelect": "Listo",
+    "selectPhoto": "Seleccionar {{name}}",
+    "unselectPhoto": "Quitar {{name}}",
+    "selectedCount_one": "{{count}} foto seleccionada",
+    "selectedCount_other": "{{count}} fotos seleccionadas",
+    "selectAll": "Seleccionar todas",
+    "favorite": "Favorita",
+    "unfavorite": "Quitar de favoritas",
+    "favoritesLimit": "Puedes elegir hasta {{count}} favoritas.",
+    "favoritesEmpty": "Toca el corazón de una foto para agregarla aquí.",
+    "download": "Descargar",
+    "downloading": "Guardando {{done}} de {{total}}…",
+    "downloaded_one": "{{count}} foto guardada",
+    "downloaded_other": "{{count}} fotos guardadas",
+    "downloadFailed": "No se pudo descargar. Intenta de nuevo.",
+    "clearSelection": "Quitar selección",
+    "favoriteFailed": "No se pudo actualizar la favorita. Intenta de nuevo.",
+    "deselectAll": "Quitar todas"
+  },
+  "viewer": {
+    "label": "Foto {{n}} de {{total}}",
+    "counter": "{{n}} / {{total}}",
+    "open": "Abrir {{name}}",
+    "close": "Cerrar",
+    "previous": "Foto anterior",
+    "next": "Foto siguiente",
+    "favorite": "Favorita",
+    "unfavorite": "Quitar de favoritas",
+    "download": "Descargar",
+    "tools": "Herramientas",
+    "zoom": "Zoom",
+    "compare": "Comparar",
+    "rotate": "Rotar",
+    "resize": "Tamaño",
+    "info": "Info",
+    "closePanel": "Cerrar panel",
+    "strip": "Fotos",
+    "pickSecond": "Elige la segunda foto en la tira de abajo",
+    "unsaved": "Cambios para tu descarga",
+    "cancel": "Cancelar",
+    "downloadEdited": "Descargar editada",
+    "compareLabel": "Comparando las fotos {{a}} y {{b}}",
+    "panel": {
+      "rotate": "Rotar y voltear",
+      "resize": "Tamaño",
+      "info": "Info de la foto"
+    },
+    "isFavorite": "En tus favoritas",
+    "preparingEdit": "Preparando…",
+    "editedSaved": "Tu foto editada se descargó.",
+    "editBusy": "Todavía se está preparando otra edición. Intenta de nuevo en un momento.",
+    "editInvalid": "Esa edición no se puede hacer. Revisa el tamaño e intenta de nuevo."
+  },
+  "profile": {
+    "title": "Perfil",
+    "clientSince": "Cliente desde {{date}}",
+    "contact": "Contacto",
+    "email": "Correo",
+    "phone": "Teléfono",
+    "instagram": "Instagram",
+    "signOut": "Cerrar sesión"
+  },
+  "notFound": {
+    "title": "No encontramos esa página",
+    "back": "Ir a tus galerías"
+  },
+  "errors": {
+    "generic": "Algo salió mal. Inténtalo de nuevo.",
+    "offline": "No hay conexión con el servidor. Revisa tu internet.",
+    "retry": "Reintentar"
+  },
+  "download": {
+    "title": "Descargar",
+    "all": "Descargar todas",
+    "saveToPhotos": "Guardar en Fotos",
+    "webCopy": "Descargar copia web",
+    "webCopies": "Descargar copias web",
+    "webNote": "Copia web, calidad reducida. Ideal para compartir.",
+    "zip": "Descargar ZIP",
+    "zipNote": "Calidad completa. Tus archivos originales.",
+    "original": "Descargar original",
+    "originalNote": "Calidad completa. El archivo original.",
+    "preparing": "Tu descarga está empezando. Los ZIP grandes pueden tardar un minuto.",
+    "wait": "Todavía hay otra descarga en curso."
+  },
+  "zoom": {
+    "label": "Zoom",
+    "inTool": "Acercar: toca la foto, o presiona otra vez para acercar al centro",
+    "outTool": "Alejar: toca la foto, o presiona otra vez para alejar desde el centro",
+    "panTool": "Mano: arrastra para mover",
+    "out": "Alejar",
+    "in": "Acercar",
+    "level": "Nivel de zoom",
+    "fit": "Ajustar a la pantalla",
+    "actual": "Píxeles reales"
+  },
+  "edit": {
+    "left": "Izquierda 90°",
+    "right": "Derecha 90°",
+    "flipH": "Voltear ↔",
+    "flipV": "Voltear ↕",
+    "straighten": "Enderezar",
+    "straightenNote": "Corrige un horizonte chueco. La foto se recorta un poco para llenar el marco.",
+    "size": "Tamaño",
+    "preset": {
+      "original": "Original",
+      "web": "Web 2048",
+      "social": "Redes 1080"
+    },
+    "width": "Ancho px",
+    "height": "Alto px",
+    "result": "Resultado",
+    "resultNote": "{{pct}}% de los píxeles. Solo se reduce, nunca se agranda. Tu edición se hace al descargar; no se guarda nada."
+  },
+  "info": {
+    "error": "No se pudo cargar la info de la foto.",
+    "shot": "La toma",
+    "camera": "Cámara",
+    "lens": "Lente",
+    "focal": "Distancia focal",
+    "aperture": "Apertura",
+    "shutter": "Obturador",
+    "file": "El archivo",
+    "name": "Nombre",
+    "dimensions": "Dimensiones",
+    "megapixels": "{{mp}} megapíxeles.",
+    "print": "Se imprime nítida hasta unas {{long}} × {{short}} pulgadas.",
+    "size": "Peso",
+    "format": "Formato",
+    "when": "Cuándo y dónde",
+    "taken": "Tomada",
+    "studioTime": "Hora del estudio (Phoenix).",
+    "notRecorded": "Sin registro",
+    "location": "Ubicación",
+    "locationSaved": "Guardada en el archivo",
+    "locationHint": "Las coordenadas se quedan dentro de tu archivo original; aquí no se muestran.",
+    "set": "Set",
+    "rights": "Derechos",
+    "owner": "Fotógrafa",
+    "copyright": "Copyright",
+    "licensee": "Licenciada a",
+    "terms": "Términos",
+    "takenWith": "Tomada con",
+    "aCamera": "una cámara",
+    "at": "a",
+    "noCamera": "Este archivo no tiene datos de cámara (pudo ser exportado o editado).",
+    "hint": {
+      "shutterVeryFast": "Muy rápido: congela el movimiento.",
+      "shutterFast": "Lo bastante rápido para personas, sin borrosidad.",
+      "shutterSlow": "Lento: necesita pulso firme o tripié.",
+      "shutterVerySlow": "Muy lento: solo con tripié.",
+      "apertureWide": "Muy abierta: sujeto nítido y fondo suave y desenfocado.",
+      "apertureBalanced": "Equilibrada: sujeto nítido y fondo suavemente difuminado.",
+      "apertureNarrow": "Cerrada: casi toda la escena enfocada.",
+      "isoLow": "Bajo: imagen limpia, poco grano.",
+      "isoMedium": "Medio: un poco de grano en las sombras.",
+      "isoHigh": "Alto: poca luz, grano visible.",
+      "focalWide": "Gran angular: abarca toda la escena.",
+      "focalNatural": "Vista natural, parecida a la del ojo.",
+      "focalShortTele": "Teleobjetivo corto: favorece los retratos.",
+      "focalLongTele": "Teleobjetivo largo: acerca lo lejano."
+    }
+  },
+  "contact": {
+    "title": "¿Preguntas?",
+    "text": "Escríbele a {{name}}",
+    "instagram": "Instagram"
+  },
+  "bookings": {
+    "title": "Tus sesiones",
+    "next": "Próxima sesión",
+    "state": {
+      "requested": "Esperando a Areli",
+      "awaiting_deposit": "Depósito pendiente",
+      "upcoming": "Confirmada",
+      "completed": "Hecha",
+      "cancelled": "Cancelada"
+    },
+    "requestedNote": "Areli confirma cada sesión personalmente. Pronto te escribirá por mensaje o correo.",
+    "depositNote": "Envía el depósito para apartar tu fecha →",
+    "addToCalendar": "Agregar al calendario",
+    "seePhotos": "Ver fotos",
+    "filters": {
+      "upcoming": "Próximas",
+      "past": "Anteriores"
+    },
+    "empty": {
+      "upcoming": "No tienes sesiones próximas",
+      "upcomingBody": "Cuando reserves con Areli, tu sesión aparecerá aquí.",
+      "past": "Aún no hay sesiones anteriores"
+    },
+    "loadMore": "Ver más",
+    "loadingMore": "Cargando…"
+  },
+  "payments": {
+    "title": "Pagos",
+    "paidOf": "{{paid}} pagado de {{total}}",
+    "ring": {
+      "left": "falta",
+      "kept": "pagado"
+    },
+    "status": {
+      "depositDue": "Depósito de {{amount}} antes del {{date}}",
+      "depositLeft": "Depósito de {{amount}} para apartar tu fecha",
+      "depositPaid": "Depósito recibido",
+      "paid": "Pagado por completo",
+      "cancelled": "Sesión cancelada"
+    },
+    "travelFee": "Traslado",
+    "adjustment": "Ajuste",
+    "total": "Total",
+    "balance": "Saldo",
+    "kind": {
+      "DEPOSIT": "Depósito",
+      "BALANCE": "Pago",
+      "REFUND": "Reembolso"
+    },
+    "method": {
+      "ZELLE": "Zelle",
+      "CASH_APP": "Cash App",
+      "CASH": "Efectivo"
+    },
+    "filters": {
+      "pending": "Pendientes ({{count}})",
+      "paid": "Pagados"
+    },
+    "empty": {
+      "pending": "No tienes nada por pagar",
+      "paid": "Aún no hay pagos"
+    },
+    "howToPay": {
+      "title": "Cómo pagar",
+      "note": "Escribe tu nombre y la fecha de tu sesión en la nota. Areli confirma cada pago personalmente.",
+      "askAreli": "Escríbele a Areli para pagar con Zelle o Cash App."
+    },
+    "copy": "Copiar",
+    "copied": "Copiado",
+    "copyLabel": "Copiar {{what}}"
+  }
+}

@@ -1,0 +1,330 @@
+{
+  "nav": {
+    "label": "Main",
+    "galleries": "Galleries",
+    "profile": "Profile",
+    "bookings": "Bookings",
+    "payments": "Payments"
+  },
+  "language": {
+    "label": "Language"
+  },
+  "signIn": {
+    "title": "Sign in",
+    "subtitle": "See and download your photos. Use the email or phone number Areli has on file.",
+    "photoAlt": "A couple walking toward the Superstition Mountains, a tiny onesie line between them",
+    "backToSite": "← Back to site",
+    "identifier": "Email or phone",
+    "identifierPlaceholder": "you@email.com or (480) 555-0123",
+    "password": "Password",
+    "show": "Show",
+    "hide": "Hide",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "submit": "Sign in",
+    "submitting": "Signing in…",
+    "forgot": "Forgot your password? Text or message Areli and she'll send you a new one.",
+    "errors": {
+      "identifierRequired": "Enter your email or phone number.",
+      "passwordRequired": "Enter your password.",
+      "wrong": "That email or phone and password don't match.",
+      "tooMany": "Too many attempts. Try again in a few minutes.",
+      "sessionEnded": "Your session ended. Sign in again.",
+      "phoneInvalid": "Enter a complete phone number, like (480) 555-0123.",
+      "emailInvalid": "Enter a valid email, like you@email.com."
+    }
+  },
+  "password": {
+    "title": "Choose your password",
+    "subtitle": "Choose your own password to see your photos. You'll use it from now on.",
+    "new": "New password",
+    "repeat": "Repeat the new password",
+    "rulesLabel": "Password rules",
+    "met": "— met",
+    "notMet": "— not met yet",
+    "save": "Save password",
+    "saving": "Saving…",
+    "rules": {
+      "length": "More than 8 characters",
+      "uppercase": "At least 1 uppercase letter",
+      "number": "At least 1 number",
+      "noName": "Doesn’t contain your first or last name",
+      "match": "Both passwords match"
+    },
+    "errors": {
+      "sameAsTemporary": "Choose a password different from the one we sent you.",
+      "alreadyChosen": "Your password was already chosen. Sign in with it."
+    }
+  },
+  "galleries": {
+    "title": "Your galleries",
+    "hello": "Hi, {{name}}",
+    "photoCount_one": "{{count}} photo",
+    "photoCount_other": "{{count}} photos",
+    "daysLeft_one": "{{count}} day left",
+    "daysLeft_other": "{{count}} days left",
+    "lastDay": "Last day",
+    "draft": "Draft",
+    "expiredOn": "Expired on {{date}}",
+    "expiredNote": "These galleries expired and their photos were removed. Message Areli if you need something from them.",
+    "filters": {
+      "available": "Available",
+      "showExpired": "Expired ({{count}})"
+    },
+    "empty": {
+      "title": "No galleries yet",
+      "body": "Your photos will appear here as soon as Areli delivers them. We'll email you."
+    }
+  },
+  "gallery": {
+    "back": "Back to galleries",
+    "allPhotos": "All",
+    "sets": "Sets",
+    "photos_one": "{{count}} photo",
+    "photos_other": "{{count}} photos",
+    "availableUntil": "Available until {{date}}",
+    "expiresToday": "This gallery closes today. Save the photos you want to keep.",
+    "expiresSoon_one": "This gallery closes tomorrow ({{date}}). Save the photos you want to keep.",
+    "expiresSoon_other": "This gallery closes in {{count}} days ({{date}}). Save the photos you want to keep.",
+    "favorites": "Favorites",
+    "select": "Select",
+    "cancelSelect": "Done",
+    "selectPhoto": "Select {{name}}",
+    "unselectPhoto": "Unselect {{name}}",
+    "selectedCount_one": "{{count}} photo selected",
+    "selectedCount_other": "{{count}} photos selected",
+    "selectAll": "Select all",
+    "favorite": "Favorite",
+    "unfavorite": "Remove favorite",
+    "favoritesLimit": "You can pick up to {{count}} favorites.",
+    "favoritesEmpty": "Tap the heart on a photo to add it here.",
+    "download": "Download",
+    "downloading": "Saving {{done}} of {{total}}…",
+    "downloaded_one": "{{count}} photo saved",
+    "downloaded_other": "{{count}} photos saved",
+    "downloadFailed": "Couldn't download. Try again.",
+    "clearSelection": "Clear selection",
+    "favoriteFailed": "Couldn't update the favorite. Try again.",
+    "deselectAll": "Deselect all"
+  },
+  "viewer": {
+    "label": "Photo {{n}} of {{total}}",
+    "counter": "{{n}} / {{total}}",
+    "open": "Open {{name}}",
+    "close": "Close",
+    "previous": "Previous photo",
+    "next": "Next photo",
+    "favorite": "Favorite",
+    "unfavorite": "Remove favorite",
+    "download": "Download",
+    "tools": "Tools",
+    "zoom": "Zoom",
+    "compare": "Compare",
+    "rotate": "Rotate",
+    "resize": "Resize",
+    "info": "Info",
+    "closePanel": "Close panel",
+    "strip": "Photos",
+    "pickSecond": "Pick the second photo from the strip below",
+    "unsaved": "Edits for your download",
+    "cancel": "Cancel",
+    "downloadEdited": "Download edited",
+    "compareLabel": "Comparing photo {{a}} and {{b}}",
+    "panel": {
+      "rotate": "Rotate & flip",
+      "resize": "Resize",
+      "info": "Photo info"
+    },
+    "isFavorite": "In your favorites",
+    "preparingEdit": "Preparing…",
+    "editedSaved": "Your edited photo is downloaded.",
+    "editBusy": "Another edit is still being prepared. Try again in a moment.",
+    "editInvalid": "That edit can't be made. Check the size and try again."
+  },
+  "profile": {
+    "title": "Profile",
+    "clientSince": "Client since {{date}}",
+    "contact": "Contact",
+    "email": "Email",
+    "phone": "Phone",
+    "instagram": "Instagram",
+    "signOut": "Sign out"
+  },
+  "notFound": {
+    "title": "We couldn't find that page",
+    "back": "Go to your galleries"
+  },
+  "errors": {
+    "generic": "Something went wrong. Try again.",
+    "offline": "Can't reach the server. Check your connection.",
+    "retry": "Try again"
+  },
+  "download": {
+    "title": "Download",
+    "all": "Download all",
+    "saveToPhotos": "Save to Photos",
+    "webCopy": "Download web copy",
+    "webCopies": "Download web copies",
+    "webNote": "Web copy, reduced quality. Great for sharing.",
+    "zip": "Download ZIP",
+    "zipNote": "Full quality. Your original files.",
+    "original": "Download original",
+    "originalNote": "Full quality. The original file.",
+    "preparing": "Your download is starting. Large ZIPs can take a minute.",
+    "wait": "Another download is still running."
+  },
+  "zoom": {
+    "label": "Zoom",
+    "inTool": "Zoom in: click the photo, or press again to zoom at the center",
+    "outTool": "Zoom out: click the photo, or press again to zoom out from the center",
+    "panTool": "Hand: drag to move",
+    "out": "Zoom out",
+    "in": "Zoom in",
+    "level": "Zoom level",
+    "fit": "Fit to screen",
+    "actual": "Actual pixels"
+  },
+  "edit": {
+    "left": "Left 90°",
+    "right": "Right 90°",
+    "flipH": "Flip ↔",
+    "flipV": "Flip ↕",
+    "straighten": "Straighten",
+    "straightenNote": "Fix a tilted horizon. The photo is trimmed slightly to fill the frame.",
+    "size": "Size",
+    "preset": {
+      "original": "Original",
+      "web": "Web 2048",
+      "social": "Social 1080"
+    },
+    "width": "Width px",
+    "height": "Height px",
+    "result": "Result",
+    "resultNote": "{{pct}}% of the pixels. It only gets smaller, never enlarged. Your edit is made when you download; nothing is saved."
+  },
+  "info": {
+    "error": "The photo info could not be loaded.",
+    "shot": "The shot",
+    "camera": "Camera",
+    "lens": "Lens",
+    "focal": "Focal length",
+    "aperture": "Aperture",
+    "shutter": "Shutter",
+    "file": "The file",
+    "name": "Name",
+    "dimensions": "Dimensions",
+    "megapixels": "{{mp}} megapixels.",
+    "print": "Prints sharp up to about {{long}} × {{short}} in.",
+    "size": "Size",
+    "format": "Format",
+    "when": "When & where",
+    "taken": "Taken",
+    "studioTime": "Studio time (Phoenix).",
+    "notRecorded": "Not recorded",
+    "location": "Location",
+    "locationSaved": "Saved in the file",
+    "locationHint": "The coordinates stay inside your original file; they are not shown here.",
+    "set": "Set",
+    "rights": "Rights",
+    "owner": "Photographer",
+    "copyright": "Copyright",
+    "licensee": "Licensed to",
+    "terms": "Terms",
+    "takenWith": "Taken with",
+    "aCamera": "a camera",
+    "at": "at",
+    "noCamera": "This file has no camera data (it may have been exported or edited).",
+    "hint": {
+      "shutterVeryFast": "Very fast: freezes movement.",
+      "shutterFast": "Fast enough for people, without blur.",
+      "shutterSlow": "Slow: needs a steady hand or a tripod.",
+      "shutterVerySlow": "Very slow: only for a tripod.",
+      "apertureWide": "Wide open: sharp subject, soft blurred background.",
+      "apertureBalanced": "Balanced: subject sharp, background gently soft.",
+      "apertureNarrow": "Narrow: most of the scene in focus.",
+      "isoLow": "Low: clean image, little grain.",
+      "isoMedium": "Medium: a little grain in the shadows.",
+      "isoHigh": "High: shot in low light, visible grain.",
+      "focalWide": "Wide angle: takes in the whole scene.",
+      "focalNatural": "Natural view, close to what the eye sees.",
+      "focalShortTele": "Short telephoto: flattering for portraits.",
+      "focalLongTele": "Long telephoto: brings distant subjects close."
+    }
+  },
+  "contact": {
+    "title": "Questions?",
+    "text": "Text {{name}}",
+    "instagram": "Instagram"
+  },
+  "bookings": {
+    "title": "Your sessions",
+    "next": "Next session",
+    "state": {
+      "requested": "Waiting for Areli",
+      "awaiting_deposit": "Deposit pending",
+      "upcoming": "Confirmed",
+      "completed": "Done",
+      "cancelled": "Cancelled"
+    },
+    "requestedNote": "Areli confirms every session by hand. She'll text or email you soon.",
+    "depositNote": "Send the deposit to hold your date →",
+    "addToCalendar": "Add to calendar",
+    "seePhotos": "See photos",
+    "filters": {
+      "upcoming": "Upcoming",
+      "past": "Past"
+    },
+    "empty": {
+      "upcoming": "No upcoming sessions",
+      "upcomingBody": "When you book with Areli, your session will show up here.",
+      "past": "No past sessions yet"
+    },
+    "loadMore": "Show more",
+    "loadingMore": "Loading more…"
+  },
+  "payments": {
+    "title": "Payments",
+    "paidOf": "{{paid}} paid of {{total}}",
+    "ring": {
+      "left": "left",
+      "kept": "paid"
+    },
+    "status": {
+      "depositDue": "{{amount}} deposit due by {{date}}",
+      "depositLeft": "{{amount}} deposit to hold your date",
+      "depositPaid": "Deposit received",
+      "paid": "Paid in full",
+      "cancelled": "Session cancelled"
+    },
+    "travelFee": "Travel fee",
+    "adjustment": "Adjustment",
+    "total": "Total",
+    "balance": "Balance",
+    "kind": {
+      "DEPOSIT": "Deposit",
+      "BALANCE": "Payment",
+      "REFUND": "Refund"
+    },
+    "method": {
+      "ZELLE": "Zelle",
+      "CASH_APP": "Cash App",
+      "CASH": "Cash"
+    },
+    "filters": {
+      "pending": "Pending ({{count}})",
+      "paid": "Paid"
+    },
+    "empty": {
+      "pending": "Nothing to pay right now",
+      "paid": "No payments yet"
+    },
+    "howToPay": {
+      "title": "How to pay",
+      "note": "Add your name and session date to the note. Areli confirms each payment by hand.",
+      "askAreli": "Text Areli to pay with Zelle or Cash App."
+    },
+    "copy": "Copy",
+    "copied": "Copied",
+    "copyLabel": "Copy {{what}}"
+  }
+}

@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE `photos` ADD COLUMN `focusSource` ENUM('FACE', 'SALIENCY', 'MANUAL') NULL,
+    ADD COLUMN `focusX` DOUBLE NULL,
+    ADD COLUMN `focusY` DOUBLE NULL;

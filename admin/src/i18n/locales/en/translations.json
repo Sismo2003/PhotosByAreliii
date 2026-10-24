@@ -1,0 +1,14 @@
+{
+  "nav": {
+    "overview": "Overview",
+    "bookings": "Bookings",
+    "clients": "Clients",
+    "galleries": "Galleries",
+    "services": "Services",
+    "mail": "Mail",
+    "settings": "Settings",
+    "settingsStudio": "Studio",
+    "settingsEmail": "Email",
+    "settingsTemplates": "Email templates"
+  }
+}

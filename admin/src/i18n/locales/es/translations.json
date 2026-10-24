@@ -1,0 +1,14 @@
+{
+  "nav": {
+    "overview": "Resumen",
+    "bookings": "Reservas",
+    "clients": "Clientes",
+    "galleries": "Galerías",
+    "services": "Servicios",
+    "mail": "Correo",
+    "settings": "Ajustes",
+    "settingsStudio": "Estudio",
+    "settingsEmail": "Correo",
+    "settingsTemplates": "Plantillas de correo"
+  }
+}

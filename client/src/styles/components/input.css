@@ -1,0 +1,27 @@
+.input-root,
+.input-wrapper {
+  @apply flex flex-col;
+}
+
+.form-input-base,
+.form-textarea-base {
+  @apply block w-full appearance-none bg-transparent tracking-wide outline-hidden transition-colors duration-200 ease-in-out placeholder:font-light focus:outline-hidden disabled:select-none;
+}
+
+/* Design system: underline fields — no box, 1px line-strong bottom border, 17px text. */
+.form-input,
+.form-textarea {
+  @apply rounded-none border-0 border-b px-0 py-2 text-start text-body text-gray-800 placeholder:text-gray-400 dark:text-dark-50 dark:placeholder:text-dark-400;
+}
+
+.form-input {
+  @apply min-h-11;
+}
+
+.input-label {
+  @apply text-[0.6875rem] leading-4 font-medium uppercase tracking-[0.14em] text-gray-500 dark:text-dark-300;
+}
+
+.form-textarea {
+  @apply resize-none;
+}

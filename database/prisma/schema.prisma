@@ -1,0 +1,730 @@
+// Source of truth for the DB schema. Decisions D1–D16: database/handoff.md §7.
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+// ─── Enums ─────────────────────────────────────────────────────────────
+
+enum Role {
+  ADMIN
+  CLIENT
+}
+
+enum HeardFrom {
+  INSTAGRAM
+  FRIEND
+  GOOGLE
+  TIKTOK
+  RETURNING_CLIENT
+  OTHER
+}
+
+enum PartySize {
+  JUST_ME
+  TWO
+  THREE_TO_FIVE
+  SIX_TO_EIGHT
+}
+
+enum BookingSource {
+  WEBSITE
+  MANUAL
+}
+
+enum BookingStatus {
+  REQUEST
+  AWAITING_DEPOSIT
+  CONFIRMED
+  DECLINED
+  CANCELLED
+  EXPIRED
+}
+
+enum LocationKind {
+  PRESET
+  CAMPUS
+  STUDIO
+  OTHER
+}
+
+enum CancelReason {
+  CLIENT_REQUEST
+  WEATHER
+  PHOTOGRAPHER_UNAVAILABLE
+  NO_DEPOSIT
+  NO_SHOW // more than 30 min late — deposit not carried over
+}
+
+enum SharePermission {
+  YES
+  PARTIAL // see doNotPostNotes
+  NO
+}
+
+enum ReviewStatus {
+  NONE
+  REQUESTED
+  RECEIVED
+}
+
+enum PaymentMethod {
+  ZELLE
+  CASH_APP
+  CASH
+}
+
+enum PaymentKind {
+  DEPOSIT
+  BALANCE
+  REFUND
+}
+
+enum RebookKind {
+  SIX_MONTHS_FAMILY
+  ONE_YEAR_ANNIVERSARY_BIRTHDAY
+  NEXT_SPRING_GRADUATION
+  NEWBORN
+  CUSTOM
+}
+
+enum GalleryStatus {
+  DRAFT
+  DELIVERED
+}
+
+enum CoverLayout {
+  FULL
+  SPLIT
+  MINIMAL
+}
+
+enum DownloadMode {
+  HIGH_AND_WEB
+  WEB_ONLY
+  OFF
+}
+
+enum GalleryPrivacy {
+  CLIENT_LOGIN
+  PASSWORD
+  PUBLIC_LINK
+}
+
+// How a /book request was linked to an existing client (handoff §4.4 "Cliente que vuelve").
+enum ClientMatch {
+  NEW // no email or phone match — a new Client was created
+  EMAIL
+  PHONE // other email, same phone — Areli reviews it
+  BOTH // email and phone point to the same client
+  CONFLICT // email is one client, phone is another — linked by email, Areli reviews it
+}
+
+// Photo storage level — docs/almacenamiento-fotos.md §4.2
+enum StorageLevel {
+  OK // > 60% free
+  LOW // 30–60% free
+  CRITICAL // < 30% free
+  FULL // <= 500 MB free — uploads blocked
+}
+
+enum EmailStatus {
+  PENDING
+  SENDING
+  SENT
+  FAILED
+  CANCELLED
+  SKIPPED // sending or the template was turned off — can be sent later with "Send now"
+}
+
+enum ActorType {
+  ADMIN
+  CLIENT
+  SYSTEM
+}
+
+// ─── Catalog ───────────────────────────────────────────────────────────
+
+enum ServiceStatus {
+  LIVE // bookable (/book and New booking)
+  HIDDEN // kept for old bookings, not bookable
+  DRAFT
+}
+
+// What Areli offers: edited from AdminServices (services, packages, add-ons). It has nothing to do
+// with the public landing — its copy and photos live in the frontend code (decision 2026-10-05).
+model Service {
+  id        Int           @id @default(autoincrement())
+  slug      String        @unique // stable key, generated from the name; never edited
+  name      String
+  status    ServiceStatus @default(DRAFT)
+  position  Int           @default(0)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  packages Package[]      @relation("ServicePackages")
+  extras   ExtraService[]
+  bookings Booking[]
+
+  @@map("services")
+}
+
+model Package {
+  id                Int      @id @default(autoincrement())
+  serviceId         Int
+  service           Service  @relation("ServicePackages", fields: [serviceId], references: [id], onDelete: Restrict)
+  name              String
+  priceCents        Int
+  durationMinutes   Int // 30, 45, 60, 90, 120, 180, 210, 240, 480 (= full day)
+  photoCount        Int? // the real price list delivers every photo edited — leave null
+  outfits           Int?
+  maxPeople         Int?
+  sessionCount      Int      @default(1) // 1 or 2; two-session packages are ONE booking (D6)
+  customDescription String? // replaces the automatic "1 hour · 2 outfits · up to 4 people" line
+  isFeatured        Boolean  @default(false) // "Most booked"
+  hidden            Boolean  @default(false)
+  position          Int      @default(0)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  bookings Booking[]
+
+  @@unique([serviceId, name])
+  @@map("packages")
+}
+
+// "Add-ons" in AdminServices; "Extras — optional" in /book step 1.
+model Extra {
+  id         Int     @id @default(autoincrement())
+  name       String  @unique
+  priceCents Int
+  minutes    Int     @default(0) // session time it adds PER UNIT ("every 30 mins added is +$50" → 30); 0 = none
+  active     Boolean @default(true)
+  position   Int     @default(0)
+
+  services ExtraService[]
+  bookings BookingExtra[]
+
+  @@map("extras")
+}
+
+// Which services an add-on appears on (outfit change = all, extra 30 min = birthdays & parties).
+model ExtraService {
+  extraId   Int
+  extra     Extra   @relation(fields: [extraId], references: [id], onDelete: Cascade)
+  serviceId Int
+  service   Service @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+
+  @@id([extraId, serviceId])
+  @@index([serviceId])
+  @@map("extra_services")
+}
+
+// ─── People ────────────────────────────────────────────────────────────
+
+model Client {
+  id             Int        @id @default(autoincrement())
+  displayName    String // "The Ortega family", "Marco & Lucía"
+  firstName      String? // for "Hi Emily" in emails
+  lastName       String?
+  email          String     @unique
+  phone          String? // as typed: "(480) 555-0100"
+  phoneE164      String?    @unique // normalized "+14805550100" — second identifier after email; null if no phone
+  instagram      String?
+  heardFrom      HeardFrom?
+  privateNotes   String?    @db.Text
+  locale         String     @default("en")
+  emailBouncedAt DateTime? // hard bounce or spam complaint — stop emailing until Areli fixes it
+  createdAt      DateTime   @default(now()) // "Client since"
+  updatedAt      DateTime   @updatedAt
+  // Soft delete: the admin hides the client everywhere. Nothing else (bookings, payments,
+  // galleries) is touched, and the client's login stops working. email/phoneE164 stay taken.
+  deletedAt      DateTime?
+
+  user            User?
+  bookings        Booking[]
+  galleries       Gallery[]
+  rebookReminders RebookReminder[]
+  favorites       Favorite[]
+  events          ActivityEvent[]
+  emails          EmailOutbox[]
+  inboundEmails   EmailInbound[]
+
+  @@index([displayName])
+  @@index([deletedAt])
+  @@map("clients")
+}
+
+model User {
+  id                 Int       @id @default(autoincrement())
+  email              String    @unique
+  // Login phone and name for users without a Client row (Areli). Clients sign in with
+  // Client.phoneE164 and are named by Client.displayName.
+  name               String?
+  phone              String? // as typed
+  phoneE164          String?   @unique // "+14805550100"
+  passwordHash       String
+  role               Role      @default(CLIENT)
+  clientId           Int?      @unique
+  client             Client?   @relation(fields: [clientId], references: [id])
+  mustChangePassword Boolean   @default(false)
+  // Set whenever the password changes: a session (JWT) issued before this moment is rejected.
+  passwordChangedAt  DateTime?
+  invitedAt          DateTime?
+  lastLoginAt        DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  resetTokens PasswordResetToken[]
+
+  @@map("users")
+}
+
+model PasswordResetToken {
+  id        Int       @id @default(autoincrement())
+  userId    Int
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+  @@map("password_reset_tokens")
+}
+
+// ─── Bookings & money ──────────────────────────────────────────────────
+
+model Booking {
+  id       Int           @id @default(autoincrement())
+  code     String        @unique // "PBA-0151"
+  clientId Int
+  client   Client        @relation(fields: [clientId], references: [id])
+  source   BookingSource @default(WEBSITE)
+  status   BookingStatus @default(REQUEST) // REQUEST, AWAITING_DEPOSIT and CONFIRMED hold the time slot in /book (D5)
+
+  serviceId           Int
+  service             Service  @relation(fields: [serviceId], references: [id], onDelete: Restrict)
+  packageId           Int?
+  package             Package? @relation(fields: [packageId], references: [id], onDelete: Restrict)
+  serviceNameSnapshot String
+  packageNameSnapshot String?
+  packagePriceCents   Int
+  durationMinutes     Int
+
+  startsAt        DateTime // UTC; studio runs on America/Phoenix
+  locationKind    LocationKind
+  locationName    String // "Lost Dutchman State Park", "ASU Tempe campus"
+  locationAddress String?
+  travelFeeCents  Int          @default(0)
+  adjustmentCents Int          @default(0)
+  totalCents      Int
+  depositCents    Int
+
+  // Contact exactly as typed in /book. The public form never overwrites the Client row:
+  // if these differ from the client, Areli sees "Details changed" and decides.
+  contactFirstName String?
+  contactLastName  String?
+  contactEmail     String?
+  contactPhone     String?
+  clientMatchedBy  ClientMatch @default(NEW)
+  matchReviewedAt  DateTime? // Areli accepted the match (PHONE / CONFLICT)
+
+  partySize        PartySize?
+  schoolAndColors  String?
+  clientNotes      String?          @db.Text // "Anything I should know?"
+  privateNotes     String?          @db.Text // Areli only
+  inspo            String?          @db.Text
+  photosNeededBy   DateTime?        @db.Date
+  sharePermission  SharePermission?
+  doNotPostNotes   String?          @db.Text // e.g. kids' faces
+  minorConsentAt   DateTime? // parent/guardian consent for under-18 sessions
+  policyAcceptedAt DateTime?
+
+  confirmedAt     DateTime?
+  depositDueAt    DateTime?
+  declinedAt      DateTime?
+  cancelledAt     DateTime?
+  cancelReason    CancelReason?
+  depositRefunded Boolean?
+  expiredAt       DateTime?
+  rescheduleCount Int           @default(0)
+
+  thanksSentAt      DateTime?
+  reviewStatus      ReviewStatus @default(NONE)
+  reviewRequestedAt DateTime?
+  reviewReceivedAt  DateTime?
+  archivedAt        DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  extras          BookingExtra[]
+  payments        Payment[]
+  gallery         Gallery?
+  rebookReminders RebookReminder[]
+  events          ActivityEvent[]
+  emails          EmailOutbox[]
+
+  @@index([clientId])
+  @@index([status, startsAt])
+  @@index([startsAt])
+  @@map("bookings")
+}
+
+model BookingExtra {
+  bookingId          Int
+  booking            Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  extraId            Int
+  extra              Extra   @relation(fields: [extraId], references: [id], onDelete: Restrict)
+  nameSnapshot       String
+  priceCentsSnapshot Int // price of ONE unit; the line total is priceCentsSnapshot × quantity
+  quantity           Int     @default(1) // several outfit changes = one row with quantity 3
+
+  @@id([bookingId, extraId])
+  @@map("booking_extras")
+}
+
+model Payment {
+  id           Int           @id @default(autoincrement())
+  bookingId    Int
+  booking      Booking       @relation(fields: [bookingId], references: [id])
+  kind         PaymentKind
+  method       PaymentMethod
+  amountCents  Int // always positive; REFUND subtracts
+  receivedAt   DateTime      @default(now())
+  note         String?
+  recordedById Int?
+  createdAt    DateTime      @default(now())
+
+  @@index([bookingId])
+  @@index([receivedAt])
+  @@map("payments")
+}
+
+model RebookReminder {
+  id        Int        @id @default(autoincrement())
+  clientId  Int
+  client    Client     @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  bookingId Int?
+  booking   Booking?   @relation(fields: [bookingId], references: [id])
+  kind      RebookKind
+  label     String
+  dueOn     DateTime   @db.Date
+  doneAt    DateTime?
+  createdAt DateTime   @default(now())
+
+  @@index([clientId])
+  @@index([dueOn])
+  @@map("rebook_reminders")
+}
+
+// ─── Galleries ─────────────────────────────────────────────────────────
+
+model Gallery {
+  id                   Int           @id @default(autoincrement())
+  slug                 String        @unique // photosbyareli.com/g/emily-tran
+  title                String
+  clientId             Int
+  client               Client        @relation(fields: [clientId], references: [id])
+  bookingId            Int?          @unique
+  booking              Booking?      @relation(fields: [bookingId], references: [id])
+  status               GalleryStatus @default(DRAFT)
+  deliveredAt          DateTime?
+  expiresAt            DateTime?
+  expiryReminderSentAt DateTime? // 48 h warning to the client (docs/correos.md #20)
+  photosDeletedAt      DateTime? // photos removed from disk when the gallery expired (D9)
+
+  coverPhotoId Int?        @unique
+  coverPhoto   Photo?      @relation("GalleryCover", fields: [coverPhotoId], references: [id], onDelete: SetNull)
+  coverLayout  CoverLayout @default(FULL)
+
+  downloadMode      DownloadMode   @default(HIGH_AND_WEB)
+  pinRequired       Boolean        @default(true)
+  downloadPinEnc    String? // AES-256-GCM, key in .env — Areli sees it again in Settings (D3)
+  privacy           GalleryPrivacy @default(CLIENT_LOGIN)
+  accessPasswordEnc String? // only when privacy = PASSWORD
+  favoritesEnabled  Boolean        @default(true)
+  favoritesLimit    Int? // null = no limit
+  watermark         Boolean        @default(false)
+  socialSharing     Boolean        @default(false)
+
+  deliverySubject  String?
+  deliveryMessage  String? @db.Text
+  deliveredToEmail String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  sets   GallerySet[]
+  photos Photo[]         @relation("GalleryPhotos")
+  events ActivityEvent[]
+  emails EmailOutbox[]
+
+  @@index([clientId])
+  @@index([status, expiresAt])
+  @@map("galleries")
+}
+
+model GallerySet {
+  id        Int     @id @default(autoincrement())
+  galleryId Int
+  gallery   Gallery @relation(fields: [galleryId], references: [id], onDelete: Cascade)
+  name      String
+  position  Int     @default(0)
+
+  photos Photo[]
+
+  @@unique([galleryId, name])
+  @@map("gallery_sets")
+}
+
+model Photo {
+  id               Int          @id @default(autoincrement())
+  galleryId        Int
+  gallery          Gallery      @relation("GalleryPhotos", fields: [galleryId], references: [id], onDelete: Cascade)
+  setId            Int?
+  set              GallerySet?  @relation(fields: [setId], references: [id], onDelete: SetNull)
+  originalFilename String
+  mimeType         String
+  sizeBytes        Int
+  width            Int?
+  height           Int?
+  originalPath     String // never served statically
+  webPath          String // web-size download
+  thumbnailPath    String
+  position         Int          @default(0)
+  hidden           Boolean      @default(false) // "Hide": not shown to the client
+  keep             Boolean      @default(false) // DEPRECATED (2026-10-09): no longer read or written. The one Favorite is a row in `favorites` (Areli and the client share it).
+  exif             Json? // curated camera data, read from the original on first request ({} = none)
+  editedAt         DateTime? // set when Areli replaced the original from the viewer
+  // Point to keep in view when a thumbnail crops the photo (object-position), as fractions 0–1 of
+  // the photo as displayed (EXIF rotation applied). null = not computed yet (UI falls back).
+  focusX           Float?
+  focusY           Float?
+  focusSource      FocusSource?
+  uploadedAt       DateTime     @default(now())
+
+  coverOf   Gallery?   @relation("GalleryCover")
+  favorites Favorite[]
+
+  @@index([galleryId, setId, position])
+  @@map("photos")
+}
+
+enum FocusSource {
+  FACE // face detector (Backend/services/photo-focus.js)
+  SALIENCY // no face: sharp's "attention" strategy
+  MANUAL // set by Areli in the viewer; never recomputed over
+}
+
+// Only for galleries with privacy = CLIENT_LOGIN; hidden for PASSWORD / PUBLIC_LINK (D4).
+model Favorite {
+  clientId  Int
+  client    Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  photoId   Int
+  photo     Photo    @relation(fields: [photoId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@id([clientId, photoId])
+  @@index([photoId])
+  @@map("favorites")
+}
+
+// ─── Activity, settings, availability ──────────────────────────────────
+
+model ActivityEvent {
+  id        Int       @id @default(autoincrement())
+  type      String // e.g. "booking.confirmed" — list in handoff §5
+  actorType ActorType
+  actorId   Int?
+  clientId  Int?
+  client    Client?   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  bookingId Int?
+  booking   Booking?  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  galleryId Int?
+  gallery   Gallery?  @relation(fields: [galleryId], references: [id], onDelete: Cascade)
+  message   String // human line shown in History / Activity
+  metadata  Json?
+  createdAt DateTime  @default(now())
+
+  @@index([clientId, createdAt])
+  @@index([bookingId, createdAt])
+  @@index([galleryId, type, createdAt])
+  @@map("activity_events")
+}
+
+model StudioSettings {
+  id                     Int            @id @default(1)
+  depositPercent         Int            @default(50) // 50% non-refundable deposit
+  cancelNoticeHours      Int            @default(48)
+  lateGraceMinutes       Int            @default(30)
+  maxReschedules         Int            @default(1)
+  outfitChangeCents      Int            @default(1500)
+  depositDueHours        Int            @default(48)
+  replyWithinHours       Int            @default(24)
+  galleryDeliveryDays    Int            @default(14)
+  galleryExpiryDays      Int            @default(90)
+  expiryReminderHours    Int            @default(48) // client warned 48 h before photos are deleted (D9)
+  depositReminderHours   Int            @default(12)
+  prepReminderHours      Int            @default(48)
+  reviewUrl              String?
+  galleryExtendDays      Int            @default(30)
+  freeTravelMiles        Int            @default(25)
+  travelFeePerMileCents  Int            @default(100)
+  zelleHandle            String? // UNUSED — payment handles live in shared/site.js (Alexis, 2026-10-19)
+  cashAppHandle          String? // UNUSED — same
+  defaultDownloadMode    DownloadMode   @default(HIGH_AND_WEB)
+  defaultPinRequired     Boolean        @default(true)
+  defaultPrivacy         GalleryPrivacy @default(CLIENT_LOGIN)
+  defaultFavoritesLimit  Int?           @default(20)
+  defaultWatermark       Boolean        @default(false)
+  defaultSocialSharing   Boolean        @default(false)
+  bookingPolicyText      String?        @db.Text
+  bookingPolicyVersion   Int            @default(1)
+  storageAlertLevel      StorageLevel   @default(OK) // last level emailed to support (docs/almacenamiento-fotos.md §8)
+  storageAlertSentAt     DateTime?
+  mailStorageAlertLevel  StorageLevel   @default(OK) // mail archive (MAIL_STORAGE_PATH)
+  mailStorageAlertSentAt DateTime?
+  updatedAt              DateTime       @updatedAt
+
+  @@map("studio_settings")
+}
+
+model AvailabilitySlot {
+  id        Int     @id @default(autoincrement())
+  weekday   Int // 0 = Sunday
+  startTime String // "17:15" local Phoenix time
+  label     String? // "golden hour", "soft morning"
+  active    Boolean @default(true)
+
+  @@unique([weekday, startTime])
+  @@map("availability_slots")
+}
+
+model BlockedDate {
+  id     Int      @id @default(autoincrement())
+  date   DateTime @unique @db.Date
+  reason String?
+
+  @@map("blocked_dates")
+}
+
+// Every email goes through this table (docs/correos.md §5). Inserted in the same
+// transaction as the business change; a worker sends it over SMTP (Hostinger).
+model EmailOutbox {
+  id                Int                   @id @default(autoincrement())
+  key               String // catalog key, e.g. "booking.confirmed"
+  templateVersionId Int?
+  templateVersion   EmailTemplateVersion? @relation(fields: [templateVersionId], references: [id], onDelete: SetNull)
+  toEmail           String
+  toName            String?
+  locale            String                @default("en")
+  data              Json // template data — never secrets
+  secretsEnc        String?               @db.Text // temp password / PIN, AES-256-GCM; nulled once sent
+  subject           String?
+  dedupeKey         String?               @unique
+  status            EmailStatus           @default(PENDING)
+  skipReason        String?
+  isTest            Boolean               @default(false)
+  sendAfter         DateTime              @default(now())
+  attempts          Int                   @default(0)
+  nextAttemptAt     DateTime              @default(now())
+  lastError         String?               @db.Text
+  messageId         String?               @unique // "<outbox-123@domain>" — matched by bounce reports
+  emlPath           String? // copy in MAIL_STORAGE_PATH/sent/…; null once the Sent tray is emptied
+  sizeBytes         Int?
+  bouncedAt         DateTime?
+  clientId          Int?
+  client            Client?               @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  bookingId         Int?
+  booking           Booking?              @relation(fields: [bookingId], references: [id], onDelete: SetNull)
+  galleryId         Int?
+  gallery           Gallery?              @relation(fields: [galleryId], references: [id], onDelete: SetNull)
+  createdAt         DateTime              @default(now())
+  sentAt            DateTime?
+
+  @@index([status, sendAfter, nextAttemptAt])
+  @@index([clientId, createdAt])
+  @@index([bookingId])
+  @@index([galleryId])
+  @@index([createdAt])
+  @@map("email_outbox")
+}
+
+// One editable template per catalog key and language (docs/correos.md §4).
+// On/off switches live in settings.json, not here.
+model EmailTemplate {
+  id                 Int                   @id @default(autoincrement())
+  key                String // "booking.confirmed"
+  locale             String // "en" | "es"
+  draftSubject       String?
+  draftMjml          String?               @db.MediumText
+  draftProject       Json? // GrapesJS project data, to reopen the editor exactly as left
+  draftUpdatedAt     DateTime?
+  publishedVersionId Int?                  @unique
+  publishedVersion   EmailTemplateVersion? @relation("PublishedVersion", fields: [publishedVersionId], references: [id], onDelete: SetNull)
+  isDefault          Boolean               @default(true) // still the repo default, never edited
+  createdAt          DateTime              @default(now())
+  updatedAt          DateTime              @updatedAt
+
+  versions EmailTemplateVersion[] @relation("TemplateVersions")
+
+  @@unique([key, locale])
+  @@map("email_templates")
+}
+
+model EmailTemplateVersion {
+  id            Int           @id @default(autoincrement())
+  templateId    Int
+  template      EmailTemplate @relation("TemplateVersions", fields: [templateId], references: [id], onDelete: Cascade)
+  version       Int
+  subject       String
+  mjml          String        @db.MediumText
+  project       Json?
+  html          String        @db.MediumText // compiled + sanitized at publish time
+  publishedAt   DateTime      @default(now())
+  publishedById Int?
+
+  publishedFor EmailTemplate? @relation("PublishedVersion")
+  outbox       EmailOutbox[]
+
+  @@unique([templateId, version])
+  @@map("email_template_versions")
+}
+
+// Messages received in the Hostinger mailbox, synced by IMAP (docs/correos.md §7).
+// Body lives in MAIL_STORAGE_PATH/inbox/… as .eml.
+model EmailInbound {
+  id                Int       @id @default(autoincrement())
+  folder            String    @default("INBOX")
+  uidValidity       BigInt
+  uid               Int
+  messageId         String?
+  inReplyTo         String?
+  fromEmail         String
+  fromName          String?
+  toEmail           String?
+  subject           String?
+  snippet           String? // first ~200 chars of the text body
+  receivedAt        DateTime
+  sizeBytes         Int
+  emlPath           String?
+  attachments       Json? // [{ filename, contentType, size }]
+  isBounce          Boolean   @default(false)
+  bounceOutboxId    Int?
+  readAt            DateTime?
+  clientId          Int?
+  client            Client?   @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  deletedOnServerAt DateTime?
+  createdAt         DateTime  @default(now())
+
+  @@unique([folder, uidValidity, uid])
+  @@index([receivedAt])
+  @@index([clientId, receivedAt])
+  @@map("email_inbound")
+}

@@ -1,0 +1,83 @@
+# Production stack on the Hetzner server. Run from this folder: docker compose up -d --build
+# Disk limits (fixed-size filesystems for photos, MySQL and mail) are created first with
+# deploy/setup-storage.sh — see docs/almacenamiento-fotos.md §2 and docs/correos.md §8.
+
+x-logging: &logging
+  driver: json-file
+  options: { max-size: "10m", max-file: "3" }
+
+services:
+  nginx:
+    image: nginx:1.27-alpine
+    ports: ["80:80", "443:443"]
+    volumes:
+      - ./nginx/photosbyareliii.conf:/etc/nginx/conf.d/default.conf:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - /var/www/certbot:/var/www/certbot:ro
+    depends_on: [web, admin, client, api]
+    restart: unless-stopped
+    logging: *logging
+
+  admin:
+    build:
+      context: ../admin
+      args:
+        VITE_SITE_URL: https://photosbyareliii.com
+    read_only: true
+    tmpfs: ["/var/cache/nginx", "/var/run", "/tmp"]
+    restart: unless-stopped
+    logging: *logging
+
+  # Client portal + the shared /login page
+  client:
+    build:
+      context: .. # repo root, for shared/ (client/Dockerfile.dockerignore limits what is sent)
+      dockerfile: client/Dockerfile
+      args:
+        VITE_SITE_URL: https://photosbyareliii.com
+    read_only: true
+    tmpfs: ["/var/cache/nginx", "/var/run", "/tmp"]
+    restart: unless-stopped
+    logging: *logging
+
+  # Public Astro site — Dockerfile pending (Frontend/ isn't built yet). It imports shared/site.js, so
+  # build it like `client`: context .. + dockerfile Frontend/Dockerfile + Frontend/Dockerfile.dockerignore.
+  web:
+    build: ../Frontend
+    read_only: true
+    tmpfs: ["/var/cache/nginx", "/var/run", "/tmp"]
+    restart: unless-stopped
+    logging: *logging
+
+  # Express API — Dockerfile pending (Backend/ has no server.js yet).
+  # Base it on node:<v>-slim, not -alpine: onnxruntime-node (face focus, docs/api-galleries.md) needs glibc.
+  # It imports ../shared/site.js (calendar files), so build it like `client`: context .. + Backend/Dockerfile.
+  api:
+    build: ../Backend
+    user: "1000:1000"
+    read_only: true
+    tmpfs: ["/tmp:size=64m"]
+    mem_limit: 1536m
+    env_file: ./api.env
+    environment:
+      STORAGE_PATH: /app/storage
+      MAIL_STORAGE_PATH: /app/mail
+      CONFIG_PATH: /app/config/settings.json
+      STORAGE_RESERVE_BYTES: "524288000"
+      SUPPORT_EMAIL: soporte@nimbuscloud.mx
+    volumes:
+      - /srv/pba/photos:/app/storage
+      - /srv/pba/mail:/app/mail
+      - /srv/pba/config:/app/config
+    depends_on: [mysql]
+    restart: unless-stopped
+    logging: *logging
+
+  mysql:
+    image: mysql:8.4
+    mem_limit: 1g
+    env_file: ./mysql.env
+    volumes:
+      - /srv/pba/mysql:/var/lib/mysql
+    restart: unless-stopped
+    logging: *logging

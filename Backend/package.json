@@ -1,0 +1,32 @@
+{
+  "name": "backend",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "@prisma/adapter-mariadb": "^7.10.0",
+    "@prisma/client": "^7.10.0",
+    "archiver": "^8.0.0",
+    "argon2": "^0.44.0",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.6",
+    "dotenv": "^17.2.3",
+    "exifr": "^7.1.3",
+    "exiftool-vendored": "^39.0.1",
+    "express": "^5.2.1",
+    "express-rate-limit": "^8.7.1",
+    "jsonwebtoken": "^9.0.3",
+    "libphonenumber-js": "^1.13.14",
+    "luxon": "^3.7.2",
+    "morgan": "^1.10.1",
+    "multer": "^2.0.1",
+    "onnxruntime-node": "^1.30.0",
+    "sharp": "^0.35.4",
+    "yup": "^1.7.1"
+  }
+}

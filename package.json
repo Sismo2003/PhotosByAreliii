@@ -1,0 +1,17 @@
+{
+  "name": "photosbyarelli",
+  "private": true,
+  "version": "0.0.1",
+  "workspaces": [
+    "Frontend",
+    "Backend",
+    "database"
+  ],
+  "scripts": {
+    "dev:frontend": "npm run dev --workspace Frontend",
+    "dev:backend": "npm run dev --workspace Backend",
+    "prisma:generate": "npm run prisma:generate --workspace database",
+    "prisma:migrate": "npm run prisma:migrate --workspace database",
+    "setup:site": "node -e \"const f=require('fs');if(!f.existsSync('shared/site.js'))f.copyFileSync('shared/site.example.js','shared/site.js')\""
+  }
+}
