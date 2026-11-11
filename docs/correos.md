@@ -133,8 +133,8 @@ Los recordatorios para volver a reservar **no** son correos automáticos: sería
 
 ### 3.2 Ubicación y persistencia
 
-- En el contenedor: `/app/config/settings.json` (`CONFIG_PATH`).
-- En el host: bind mount de **`/srv/pba/config`**, que vive en el disco raíz porque pesa unos pocos KB. **Persiste** al reiniciar o recrear el contenedor y al actualizar la imagen.
+- En el contenedor: `/data/config/settings.json` (`CONFIG_PATH`, lo fija `deploy/docker-compose.yml`). En desarrollo: `Backend/var/settings.json` (ignorado por git y por la imagen).
+- En el host: bind mount de **`$DATA_DIR/config`** (`/srv/pba/config`, lo crea `deploy/server-setup.sh` con dueño 1000 y `0700`), que vive en el disco raíz porque pesa unos pocos KB. **Persiste** al reiniciar o recrear el contenedor y al actualizar la imagen.
 - **Al arrancar el backend:**
   1. Si el archivo **no existe**, se crea con los valores por defecto (§3.3) y con el envío **apagado**, hasta que Areli ponga la contraseña SMTP y pase "Test connection".
   2. Si existe, se lee y se **valida** con yup. Si es inválido (por ejemplo, alguien lo editó a mano y rompió el JSON), el backend **no** lo sobrescribe: arranca con el envío pausado, registra el error y el admin muestra *"Email settings file is invalid — contact Alexis"*.

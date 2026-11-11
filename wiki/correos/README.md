@@ -10,15 +10,16 @@ plantillas que Areli edita en el admin, bandeja Sent/Inbox y configuración en u
 
 ## Estado actual
 
-- Especificación v2: `docs/correos.md`. Nada implementado.
-- Tablas en el schema (`database/prisma/schema.prisma`): `EmailOutbox`, `EmailTemplate`,
-  `EmailTemplateVersion` y `EmailInbound`.
-- Pendientes con el usuario: los 5 puntos de `docs/correos.md` §12 (dominio de Areli, plan de
-  Hostinger, reseñas, recibo del balance, resumen diario).
+- **Fase 1 (envío) implementada** el 2026-10-24: catálogo de plantillas EN/ES editables en el admin,
+  outbox con reintentos, recordatorios programados y `settings.json` persistente en
+  `$DATA_DIR/config`. Falta desplegarla y probarla con Hostinger real.
+- Correos sin disparador todavía, y fase 2 (bandeja IMAP): ver [[2026-10-24-modulo-correos-implementado]].
+- Especificación: `docs/correos.md`. Pendientes con el usuario: §12.
 
 ## Entradas de bitácora
 
 - [[2026-10-02-especificacion-correos]] — catálogo de 25 correos, outbox, Hostinger por 587, plantillas editables con GrapesJS, bandeja, `settings.json`
+- [[2026-10-24-modulo-correos-implementado]] — fase 1 implementada, volumen `config/` en producción, qué falta conectar
 
 ## Decisiones clave
 
