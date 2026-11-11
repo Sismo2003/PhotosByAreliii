@@ -34,6 +34,11 @@ const protectedRoutes = {
         { path: "services/new", lazy: page(() => import("app/pages/services/new")) },
         { path: "services/:id", lazy: page(() => import("app/pages/services/service")) },
         { path: "mail", lazy: page(() => import("app/pages/mail")) },
+        // The template editor is a full page (← Email templates), outside the Settings tabs.
+        {
+          path: "settings/email-templates/:key",
+          lazy: page(() => import("app/pages/settings/email-templates/editor")),
+        },
         {
           path: "settings",
           lazy: page(() => import("app/pages/settings/Layout")),

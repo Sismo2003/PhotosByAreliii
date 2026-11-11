@@ -2,12 +2,12 @@
 import clsx from "clsx";
 import PropTypes from "prop-types";
 
-import { Switch } from "components/ui";
 import { formatDate } from "utils/date";
 
 import { INTEGRATIONS } from "../booking/integrations";
 import { money } from "../labels";
 import { durationLabel } from "../../services/labels";
+import { Toggle } from "../../galleries/parts";
 import { ActionButton } from "../parts";
 
 function Line({ label, value, strong }) {
@@ -19,8 +19,8 @@ function Line({ label, value, strong }) {
   );
 }
 
-export function Summary({ v, service, pkg, extras, price, busy, onSubmit }) {
-  const email = INTEGRATIONS.newBookingEmail; // INTEGRATION(newBookingEmail)
+export function Summary({ v, service, pkg, extras, price, busy, onSubmit, onEmailClientChange }) {
+  const email = INTEGRATIONS.newBookingEmail;
   const paid = v.payMode !== "NONE";
   // Add-ons like "Extra 30 minutes" lengthen the session (the server does the same sum).
   const addedMinutes = extras.reduce((sum, e) => sum + (e.minutes ?? 0) * v.extraQty[e.id], 0);
@@ -57,11 +57,17 @@ export function Summary({ v, service, pkg, extras, price, busy, onSubmit }) {
             : "Starts as Awaiting deposit — the client has 48 hours to pay it."}
         </p>
 
-        <div className="mt-4 flex items-center justify-between gap-3 border-t border-line pt-4" title={email.pendingNote}>
-          <span className="text-small text-ink-muted">{email.label}</span>
-          <Switch checked={false} disabled aria-label={email.label} />
+        <div className="mt-4 flex items-center justify-between gap-3 border-t border-line pt-4">
+          <span className="text-small text-ink">{email.label}</span>
+          <Toggle checked={v.emailClient !== false} onChange={onEmailClientChange} label={email.label} />
         </div>
-        {!email.ready && <p className="mt-1 text-small text-ink-muted">{email.pendingNote}</p>}
+        <p className="mt-1 text-small text-ink-muted">
+          {v.emailClient === false
+            ? "No email. Let the client know yourself."
+            : paid
+              ? "They get the confirmation with a calendar invite."
+              : "They get the deposit amount, the deadline and how to pay."}
+        </p>
 
         <ActionButton solid className="mt-5 w-full" disabled={busy} onClick={onSubmit}>
           {busy ? "Creating…" : "Create booking"}
@@ -80,4 +86,5 @@ Summary.propTypes = {
   price: PropTypes.object,
   busy: PropTypes.bool,
   onSubmit: PropTypes.func,
+  onEmailClientChange: PropTypes.func,
 };

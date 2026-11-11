@@ -18,5 +18,6 @@ export {
   archiveBookingThunk,
   unarchiveBookingThunk,
   reviewReceivedThunk,
+  sendFollowUpEmailThunk,
   setRebookReminderThunk,
 } from "./thunks";

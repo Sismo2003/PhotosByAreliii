@@ -1,22 +1,20 @@
-// "Deliver gallery" (design: GalleryDeliver / GalleryDelivered). Marks the gallery delivered and
-// then shows what the client needs: link, password (if any) and download PIN.
-//
-// INTEGRATION(correos): the email itself (To / Subject / Message) is sent by the Correos module.
-// Until then delivering only saves these fields and Areli sends the details by hand — the second
-// step says so. See docs/galleries-pendientes.md.
+// "Deliver gallery" (design: GalleryDeliver / GalleryDelivered). Marks the gallery delivered and the
+// server emails "Your photos are ready" (docs/correos.md #17): link, password, PIN and — for a client
+// who never signed in — a temporary password. Subject and note are optional: left empty, the
+// template's text in the client's language is used. The second step shows the details again, to
+// copy them for a text message.
 import { Dialog, DialogPanel, Transition, TransitionChild } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import PropTypes from "prop-types";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
-import { deliverGalleryThunk } from "slices";
+import { deliverGalleryThunk, loadEmailSettingsThunk, useEmailStore } from "slices";
 import { formatDate } from "utils/date";
 
 import { ActionButton, AlertNote, KeyValueRows } from "../../bookings/parts";
 import { Field, inputClass, TextArea } from "../../bookings/new/fields";
 import { publicGalleryUrl } from "../helpers";
-import { INTEGRATIONS } from "../integrations";
 
 async function copy(text, what) {
   try {
@@ -30,8 +28,9 @@ async function copy(text, what) {
 export function DeliverDialog({ gallery, show, onClose }) {
   const first = gallery.client?.firstName ?? gallery.client?.displayName ?? "";
   const [to, setTo] = useState(gallery.deliveredToEmail ?? gallery.client?.email ?? "");
-  const [subject, setSubject] = useState(gallery.deliverySubject ?? `Your photos are ready${first ? `, ${first}` : ""}`);
-  const [message, setMessage] = useState(gallery.deliveryMessage ?? `Hi${first ? ` ${first}` : ""},\n\nYour gallery is ready. I loved working with you — I hope you love the photos as much as I do.\n\nAreli`);
+  const [subject, setSubject] = useState(gallery.deliverySubject ?? "");
+  const [message, setMessage] = useState(gallery.deliveryMessage ?? "");
+  const sending = useEmailStore((s) => s.settings.data?.status?.state);
   const [error, setError] = useState(null);
   const [busy, setBusy] = useState(false);
   const [sent, setSent] = useState(null); // the delivered gallery
@@ -47,6 +46,19 @@ export function DeliverDialog({ gallery, show, onClose }) {
   };
 
   const link = publicGalleryUrl(gallery.slug);
+
+  // Whether the email really goes out now (paused → it waits in the list until sent by hand).
+  useEffect(() => {
+    if (show) loadEmailSettingsThunk();
+  }, [show]);
+  const emailNote =
+    sending === "on"
+      ? null
+      : sending === "paused"
+        ? "Emails are paused, so this one will wait until you send it from Settings → Email. Copy the details below for now."
+        : sending
+          ? "Email isn’t connected yet (Settings → Email). Copy the details below and send them yourself."
+          : null;
 
   return (
     <Transition appear show={show} as={Dialog} onClose={busy ? () => {} : onClose} className="fixed inset-0 z-100 flex items-center justify-center px-4 py-6">
@@ -81,7 +93,7 @@ export function DeliverDialog({ gallery, show, onClose }) {
                 ["Available until", formatDate(sent.expiresAt, "LLL d, yyyy")],
               ]}
             />
-            <AlertNote>{INTEGRATIONS.deliveryEmail.pendingNote}</AlertNote>
+            {emailNote ? <AlertNote>{emailNote}</AlertNote> : <p className="text-small text-ink">Emailed to {sent.deliveredToEmail}.</p>}
             <div className="flex flex-wrap gap-3">
               <ActionButton solid onClick={() => copy(link, "Link")}>
                 Copy link
@@ -100,13 +112,18 @@ export function DeliverDialog({ gallery, show, onClose }) {
             className="mt-6 space-y-5"
           >
             <Field label="To">{(p) => <input {...p} type="email" value={to} onChange={(e) => setTo(e.target.value)} className={inputClass} />}</Field>
-            <Field label="Subject">{(p) => <input {...p} value={subject} onChange={(e) => setSubject(e.target.value)} className={inputClass} />}</Field>
-            <Field label="Message">{(p) => <TextArea {...p} rows={6} value={message} onChange={(e) => setMessage(e.target.value)} />}</Field>
+            <Field label="Subject" optional>
+              {(p) => <input {...p} value={subject} placeholder={`Your photos are ready${first ? `, ${first}` : ""}!`} onChange={(e) => setSubject(e.target.value)} className={inputClass} />}
+            </Field>
+            <Field label="Personal note" optional hint="Shows under “Your photos are ready!”. Your signature is added for you.">
+              {(p) => <TextArea {...p} rows={4} value={message} placeholder="I loved working with you — I hope you love the photos as much as I do." onChange={(e) => setMessage(e.target.value)} />}
+            </Field>
             <p className="text-small text-ink-muted">
-              Added automatically: the gallery link{gallery.privacy === "PASSWORD" ? ", the password" : ""}
-              {gallery.pinRequired && gallery.downloadMode !== "OFF" ? " and the download PIN" : ""}.
+              Added for you: the gallery link{gallery.privacy === "PASSWORD" ? ", the password" : ""}
+              {gallery.pinRequired && gallery.downloadMode !== "OFF" ? ", the download PIN" : ""}
+              {gallery.privacy === "CLIENT_LOGIN" ? " and, if they’ve never signed in, a temporary password" : ""}.
             </p>
-            <AlertNote>{INTEGRATIONS.deliveryEmail.pendingNote}</AlertNote>
+            {emailNote && <AlertNote>{emailNote}</AlertNote>}
             {error && (
               <p role="alert" className="text-small text-alert">
                 {error}

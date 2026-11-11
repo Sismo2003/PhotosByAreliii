@@ -4,12 +4,8 @@
 // Find every usage with:  grep -rn "INTEGRATION(" admin/src Backend
 
 export const INTEGRATIONS = {
-  // Correos module (docs/correos.md): the "Your gallery is ready" email sent by Deliver.
-  // Until then delivering only marks the gallery delivered; Areli sends the link, password and PIN by hand.
-  deliveryEmail: {
-    ready: false,
-    pendingNote: "Email sending isn’t available yet. Send the link, password and PIN to the client by hand.",
-  },
+  // Correos module (docs/correos.md #17): "Your photos are ready" is sent by Deliver since 2026-10-24.
+  deliveryEmail: { ready: true },
 
   // Client gallery (the client's own view, design ClientGallery*.dc.html): "Preview as client".
   previewAsClient: {

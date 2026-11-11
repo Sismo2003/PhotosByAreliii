@@ -8,33 +8,32 @@
 // `run(booking)` must resolve `{ ok: true } | { ok: false, error }` — same shape as the thunks in
 // slices/bookings/thunks.js — so NextStepCard can toast the result like any other action.
 
+import { sendFollowUpEmailThunk } from "slices";
+
 export const INTEGRATIONS = {
-  // Correos module (docs/correos.md): thank-you email after the session.
+  // Correos module (docs/correos.md #10): thank-you email after the session. Ready since 2026-10-24.
   thankYouEmail: {
-    ready: false,
+    ready: true,
     label: "Send thank-you",
-    pendingNote: "Email sending isn’t available yet. Thank the client by hand for now.",
-    successMessage: "Thank-you sent",
-    run: null, // (booking) => sendThankYouThunk(booking.id)
+    successMessage: "Thank-you on its way",
+    run: (booking) => sendFollowUpEmailThunk(booking.id, "followup.thanks"),
   },
 
-  // Correos module: review request email (sets reviewStatus REQUESTED).
+  // Correos module (#11): review request email; also sets reviewStatus REQUESTED. Needs the review
+  // link in StudioSettings.reviewUrl — the API answers 409 with that sentence when it is missing.
   reviewRequestEmail: {
-    ready: false,
+    ready: true,
     label: "Ask for a review",
-    pendingNote: "Email sending isn’t available yet. Ask for the review by hand for now.",
-    successMessage: "Review request sent",
-    run: null, // (booking) => requestReviewThunk(booking.id)
+    successMessage: "Review request on its way",
+    run: (booking) => sendFollowUpEmailThunk(booking.id, "followup.review_request"),
   },
 
-  // Correos module: confirmation email when a booking is created by hand (docs/nuevo-booking-admin.md).
-  // Used by the "Email the client" switch in the New booking summary.
+  // Correos module: email when a booking is created by hand (docs/nuevo-booking-admin.md). The
+  // "Email the client" switch of the New booking summary sends `emailClient: true` with the booking;
+  // the server picks "Booking confirmed" or "pay the deposit" by the status it starts in.
   newBookingEmail: {
-    ready: false,
-    label: "Email the client the confirmation",
-    pendingNote: "Email sending isn’t available yet. Let the client know by hand for now.",
-    successMessage: "Confirmation sent",
-    run: null, // (booking) => sendNewBookingEmailThunk(booking.id)
+    ready: true,
+    label: "Email the client",
   },
 
   // Galleries module (docs/almacenamiento-fotos.md, docs/api-galleries.md): ready since 2026-10-04.

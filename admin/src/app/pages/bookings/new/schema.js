@@ -46,6 +46,8 @@ export const initialValues = {
   privateNotes: "",
   payMode: "NONE",
   payMethod: "",
+  // "Email the client" in the summary: confirmation or deposit request (docs/correos.md #2, #4).
+  emailClient: true,
 };
 
 const isMoney = (opts) => (v) => dollarsToCents(v, opts) !== null;
@@ -129,5 +131,6 @@ export function toPayload(v, extras) {
     adjustmentCents: dollarsToCents(v.adjustment, { allowNegative: true }) ?? 0,
     privateNotes: orUndef(v.privateNotes),
     payment: v.payMode === "NONE" ? { mode: "NONE" } : { mode: v.payMode, method: v.payMethod },
+    emailClient: v.emailClient !== false,
   };
 }

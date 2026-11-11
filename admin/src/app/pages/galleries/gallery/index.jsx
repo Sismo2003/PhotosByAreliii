@@ -3,9 +3,9 @@
 //   top bar (back to the list · ⋯ menu) → identity (booking, name, state) → Deliver →
 //   tabs Photos · Cover · Settings · Activity (kept in ?tab=) → numbers → the tab.
 //
-// INTEGRATION(correos): Deliver saves the delivery and shows the details to send by hand; the
-// email is the Correos module's job. INTEGRATION(client-gallery): "Preview as client" waits for the
-// client's own gallery. Both in docs/galleries-pendientes.md.
+// Deliver emails the client (Correos module, docs/correos.md #17) and shows the details to copy.
+// INTEGRATION(client-gallery): "Preview as client" waits for the client's own gallery
+// (docs/galleries-pendientes.md).
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { ArrowLeftIcon, EllipsisHorizontalIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";

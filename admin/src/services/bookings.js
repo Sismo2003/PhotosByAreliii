@@ -73,6 +73,9 @@ export const unarchiveBooking = (id) => axios.post(`${BASE}/${id}/unarchive`);
 
 export const markReviewReceived = (id) => axios.post(`${BASE}/${id}/review-received`);
 
+/** key: "followup.thanks" | "followup.review_request" — the email module sends it (docs/correos.md #10–11). */
+export const sendFollowUpEmail = (id, key) => axios.post(`${BASE}/${id}/email`, { key });
+
 /** { kind: RebookKind | null, dueOn?: "YYYY-MM-DD", label? } — null closes open reminders. */
 export const setRebookReminder = (id, body) =>
   axios.post(`${BASE}/${id}/rebook-reminder`, body);

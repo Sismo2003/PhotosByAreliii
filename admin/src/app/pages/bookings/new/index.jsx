@@ -155,7 +155,16 @@ export default function NewBooking() {
               <DetailsSection v={v} set={patch} errors={errors} />
               <PaymentSection v={v} set={patch} errors={errors} price={price} />
             </form>
-            <Summary v={v} service={service} pkg={pkg} extras={pickedExtras} price={price} busy={busy} onSubmit={submit} />
+            <Summary
+              v={v}
+              service={service}
+              pkg={pkg}
+              extras={pickedExtras}
+              price={price}
+              busy={busy}
+              onSubmit={submit}
+              onEmailClientChange={(emailClient) => patch({ emailClient })}
+            />
           </div>
         )}
       </div>

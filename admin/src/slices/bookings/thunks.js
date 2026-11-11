@@ -19,6 +19,7 @@ import {
   archiveBooking,
   unarchiveBooking,
   markReviewReceived,
+  sendFollowUpEmail,
   setRebookReminder,
 } from "services/bookings";
 
@@ -171,6 +172,8 @@ export const archiveBookingThunk = (id) => runAction(id, () => archiveBooking(id
 export const unarchiveBookingThunk = (id) => runAction(id, () => unarchiveBooking(id));
 
 export const reviewReceivedThunk = (id) => runAction(id, () => markReviewReceived(id));
+
+export const sendFollowUpEmailThunk = (id, key) => runAction(id, () => sendFollowUpEmail(id, key));
 
 export const setRebookReminderThunk = (id, body) =>
   runAction(id, () => setRebookReminder(id, body));
