@@ -6,9 +6,12 @@ import authRoutes from './routes/auth.routes.js';
 import bookingRoutes from './routes/booking.routes.js';
 import clientRoutes from './routes/client.routes.js';
 import clientPortalRoutes from './routes/client-portal.routes.js';
+import emailAssetRoutes from './routes/email-assets.routes.js';
+import emailRoutes from './routes/email.routes.js';
 import extraRoutes from './routes/extra.routes.js';
 import { galleryRouter, storageRouter } from './routes/gallery.routes.js';
 import overviewRoutes from './routes/overview.routes.js';
+import publicRoutes from './routes/public.routes.js';
 import serviceRoutes from './routes/service.routes.js';
 import { HttpError, sendError } from './utils/http.js';
 
@@ -30,9 +33,16 @@ app.use('/api/admin/galleries', galleryRouter);
 app.use('/api/admin/storage', storageRouter);
 app.use('/api/admin/services', serviceRoutes);
 app.use('/api/admin/extras', extraRoutes);
+app.use('/api/admin/email', emailRoutes);
 
 // CLIENT PORTAL (photosbyareliii.com/client/)
 app.use('/api/client', clientPortalRoutes);
+
+// PUBLIC (the landing's /book form — no session)
+app.use('/api/public', publicRoutes);
+
+// EMAIL (public: images that mail apps load without a session)
+app.use('/api/email-assets', emailAssetRoutes);
 
 // Liveness probe for the container healthcheck and the rollout (no DB access on purpose).
 app.get('/api/health', (_req, res) => res.json({ error: false, message: 'ok', data: { status: 'up' } }));

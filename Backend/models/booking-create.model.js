@@ -7,7 +7,9 @@ import { STUDIO_ZONE } from '../utils/date.js';
 import { toE164 } from '../utils/phone.js';
 import { HttpError } from '../utils/http.js';
 import { formatCents, withSettingsFallback } from '../services/booking-derive.js';
+import { priceBooking } from '../services/booking-pricing.js';
 import BookingModel from './booking.model.js';
+import { queueEmail } from '../services/email/outbox.js';
 
 const clean = (v) => (typeof v === 'string' ? v.trim() : v);
 const orNull = (v) => (v === undefined || v === null || clean(v) === '' ? null : clean(v));
@@ -116,28 +118,7 @@ class BookingCreateModel {
       const settings = withSettingsFallback(await tx.studioSettings.findUnique({ where: { id: 1 } }));
 
       // --- Catalog (prices come from here, never from the request) ---
-      const service = await tx.service.findUnique({ where: { id: input.serviceId } });
-      if (!service) throw new HttpError(400, 'That service does not exist');
-      const pkg = await tx.package.findUnique({ where: { id: input.packageId } });
-      if (!pkg || pkg.serviceId !== service.id) throw new HttpError(400, 'That package does not belong to the service');
-
-      const wanted = new Map();
-      for (const e of input.extras ?? []) wanted.set(e.extraId, (wanted.get(e.extraId) ?? 0) + e.quantity);
-      const extras = wanted.size
-        ? await tx.extra.findMany({ where: { id: { in: [...wanted.keys()] }, active: true }, include: { services: true } })
-        : [];
-      if (extras.length !== wanted.size) throw new HttpError(400, 'One of the extras is not available');
-      for (const e of extras) {
-        if (!e.services.some((s) => s.serviceId === service.id)) {
-          throw new HttpError(400, `"${e.name}" is not offered for ${service.name}`);
-        }
-      }
-      const extrasCents = extras.reduce((sum, e) => sum + e.priceCents * wanted.get(e.id), 0);
-      // "Every 30 mins. added is +$50": add-ons with minutes lengthen the session.
-      const durationMinutes = pkg.durationMinutes + extras.reduce((sum, e) => sum + e.minutes * wanted.get(e.id), 0);
-      const totalCents = pkg.priceCents + extrasCents + (input.travelFeeCents ?? 0) + (input.adjustmentCents ?? 0);
-      if (totalCents < 0) throw new HttpError(400, 'The adjustment is larger than the total');
-      const depositCents = Math.round((totalCents * settings.depositPercent) / 100);
+      const { service, pkg, durationMinutes, totalCents, depositCents, extraLines } = await priceBooking(tx, input, settings);
 
       // --- Client: reuse (and update) or create ---
       const { client, matchedBy } = await this.resolveClient(tx, input, actorId);
@@ -193,14 +174,7 @@ class BookingCreateModel {
           policyAcceptedAt: now.toJSDate(),
           confirmedAt: now.toJSDate(),
           depositDueAt: now.plus({ hours: settings.depositDueHours }).toJSDate(),
-          extras: {
-            create: extras.map((e) => ({
-              extraId: e.id,
-              nameSnapshot: e.name,
-              priceCentsSnapshot: e.priceCents,
-              quantity: wanted.get(e.id),
-            })),
-          },
+          extras: { create: extraLines },
         },
       });
       const code = `PBA-${String(booking.id).padStart(4, '0')}`;
@@ -226,6 +200,11 @@ class BookingCreateModel {
           metadata: { policyVersion: settings.bookingPolicyVersion, payment: pay.mode, totalCents, depositCents },
         },
       });
+      // "Email the client" on the New booking summary: the same email a website booking would get
+      // at this stage — confirmation, or "your date is held, pay the deposit".
+      if (input.emailClient) {
+        await queueEmail(tx, confirmed ? 'booking.confirmed' : 'booking.accepted_pay_deposit', { bookingId: booking.id, clientId: client.id });
+      }
       return booking.id;
     });
     return BookingModel.detailBooking(id);

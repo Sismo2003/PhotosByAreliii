@@ -1,5 +1,9 @@
 # Formulario público `/book` — instrucciones para el agente
 
+> **Estado 2026-11-10: implementado.** Qué se hizo y qué decisiones se tomaron: `docs/landing-book-integracion.md`;
+> contrato: `docs/api-public-booking.md`. El cálculo de precio ya está en `Backend/services/booking-pricing.js` (§4).
+> Duda 1 de §5 resuelta: "Extra 30 minutes" alarga la sesión y bloquea los horarios que pisa.
+
 Fecha: 2026-10-04 · Para el agente que construya (o ajuste) el formulario público de reservas
 del sitio. Lee primero `database/handoff.md` §4.4 (Booking, "Cliente que vuelve") y §4.11
 (disponibilidad), y `docs/nuevo-booking-admin.md` (el equivalente del panel).
