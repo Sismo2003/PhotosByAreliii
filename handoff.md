@@ -19,6 +19,10 @@
 > [[2026-10-03-admin-bookings-details-fixes]] para los arreglos de Bookings (Detail Changes,
 > CONFLICT sin "Not the same person", filtro de Service).
 >
+> **2026-11-10 (/book real):** el formulario público de 5 pasos crea solicitudes (`REQUEST`, `WEBSITE`) por `/api/public/*` (`docs/api-public-booking.md`, `docs/landing-book-integracion.md`). Correos `booking.request_received` y `admin.new_request` conectados. Pendientes generales en `faltantes.txt` (raíz, local). Ver [[2026-11-10-book-flujo-real]].
+>
+> **2026-10-26 (Landing):** sitio público completo en `Frontend/` (EN/ES, SEO, póliza, `/book` simple). **Handoff de la landing: `Frontend/handoff.md`.** Ver [[2026-10-26-landing-completa]].
+>
 > **2026-10-09 (Portal del cliente, primer corte):** app nueva `client/` (`/client/`) y **login único
 > `/login` para admin y clientes** — el admin ya no tiene página de login. API `/api/client/*` (solo
 > lectura, aislada por cliente). Sin ver en el navegador. **Handoff del portal: `client/handoff.md`.** Ver `client/README.md`, skill
@@ -54,7 +58,7 @@
 | `Backend/` | Arranca con `npm run dev` (puerto 4000). Montados: **`/api/auth/*`** (login con email **o teléfono**, logout, me, change-password), **`/api/admin/bookings/*`** (Requests: lista, calendario, detalle con `detailChanges`, confirm, decline, match) y **`/api/admin/services/active`** — ver [[2026-10-03-bookings-backend]] en `wiki/admin/`. Errores con `utils/http.js`. `config/db.js` usa `@prisma/adapter-mariadb`. **`/api/admin/clients/*`** y **`/api/admin/galleries/*`** + **`/api/admin/storage`** ya están montados (2026-10-04). |
 | `admin/` | **Nuevo.** React 19 + Vite 6 + Tailwind 4, a partir del template Tailux del usuario, re-tematizado con el sistema de diseño. Login con un solo campo "Email or phone" y botón Show/Hide (oculta por defecto), dos layouts (Sideblock por defecto, Main layout opcional), Display con engrane giratorio, barra de almacenamiento, Overview y Settings con pestañas. El resto son páginas vacías. `npm run dev` usa el login real contra el Backend (el bypass de desarrollo se eliminó el 2026-10-09). Ver `admin/README.md`. |
 | `client/` | **Nuevo (2026-10-09).** Portal del cliente + página única `/login`. Empieza por `client/handoff.md`. |
-| `Frontend/` | Sitio público **mínimo** (Astro estático: una página con enlaces a `/login`, Instagram y correo; `noindex` mientras el dominio sea temporal). Falta la landing real y `/book`. |
+| `Frontend/` | **Landing completa (2026-10-26)**: inicio, servicios, 6 páginas de servicio, políticas, privacidad, términos, EN (`/`) + ES (`/es/`), SEO/GEO (JSON-LD, hreflang, sitemap), fotos web en el repo, CSP. `/book` crea solicitudes reales desde el 2026-11-10 (`docs/landing-book-integracion.md`, API `docs/api-public-booking.md`). `noindex` mientras el dominio sea temporal. Sin ver en el navegador. **Handoff: `Frontend/handoff.md`.** |
 | `deploy/` · `.github/` | **Despliegue al servidor `grid`** (CI/CD por Tailscale). Imágenes, compose, vhost, rollout y CI probados en local; **el primer rollout real está pendiente**. Ver `docs/deploy.md`. |
 | `docs/` | `almacenamiento-fotos.md` (aprobada) y `correos.md` v2 (aprobada en lo general; quedan 5 puntos en su §12). |
 
@@ -160,8 +164,8 @@ usuario edita el lienzo en vivo**: vuelve a leer una pantalla antes de republica
    reales del admin.
 3. **Admin**: construir Bookings (`AdminBookings*.dc.html`), luego Clients, Galleries y Services.
    Cada página vacía dice qué pantalla y qué especificación implementar.
-4. **Frontend** (skills `frontend`, `site-config`, `landing-seo`): tokens, `site.js` /
-   `services.json` con los datos reales y la landing.
+4. **Frontend**: landing y `/book` hechos (2026-10-26 y 2026-11-10). Falta revisarlos en el navegador, Lighthouse y
+   Rich Results Test (`faltantes.txt`).
 5. **Despliegue**: hacer el primer rollout real en `grid` (`docs/deploy.md` §4: `server-setup.sh`, `.env`, llave de CI,
    secrets de GitHub). El límite de disco por sistema de archivos de tamaño fijo (`docs/almacenamiento-fotos.md` §2) sigue sin
    implementar: en `grid` las fotos van a un directorio normal.
