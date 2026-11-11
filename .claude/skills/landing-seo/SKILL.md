@@ -21,8 +21,11 @@ not marketing fluff a crawler can't act on.
 
 ## 2. Structured data (JSON-LD) — this is what GEO actually reads
 
-Every page includes a `LocalBusiness` (subtype: photography studio) JSON-LD block in
-`<head>`, sourced from `site.js`/`services.json` (**site-config**) — never hand-typed inline:
+Every page includes a `LocalBusiness` JSON-LD block in `<head>`, sourced from
+`site.js`/`services.js` (**site-config**) — never hand-typed inline. Implemented in
+`Frontend/src/seo/jsonld.ts` as `["LocalBusiness", "ProfessionalService"]` (schema.org has no
+`PhotographyBusiness` type), plus `Service`/`Offer` per service page, `BreadcrumbList`, and `FAQPage` on
+`/policies`. The sketch below is the original idea:
 
 ```html
 <script type="application/ld+json" set:html={JSON.stringify({

@@ -1,0 +1,55 @@
+---
+// Site header (Main.dc.html / LandingMobile.dc.html): wordmark, nav, language switch.
+// Phones get a "Menu" disclosure (<details>, no JS).
+import { BRAND } from "../../data/site";
+import { localizePath, useT, type Lang } from "../../i18n";
+import AccountLink from "./AccountLink.astro";
+import LanguageSwitch from "./LanguageSwitch.astro";
+
+const { lang } = Astro.props as { lang: Lang };
+const { t } = useT(lang);
+const here = Astro.url.pathname;
+const links = [
+  { href: localizePath("/", lang) + "#portfolio", label: t("nav.portfolio"), match: null },
+  { href: localizePath("/services/", lang), label: t("nav.services"), match: localizePath("/services/", lang) },
+  { href: localizePath("/book/", lang), label: t("nav.book"), match: localizePath("/book/", lang) },
+];
+const isCurrent = (match: string | null) => !!match && here.startsWith(match);
+---
+
+<header class="page-x container-site relative z-30 flex h-16 w-full items-center justify-between lg:h-[76px]">
+  <a href={localizePath("/", lang)} class="text-[12px] font-medium tracking-[0.22em] uppercase lg:text-[13px] lg:tracking-[0.24em]">
+    {BRAND.name}
+  </a>
+
+  <div class="hidden items-center gap-10 md:flex">
+    <nav aria-label={t("nav.primary")} class="eyebrow flex gap-9">
+      {
+        links.map((l) => (
+          <a href={l.href} aria-current={isCurrent(l.match) ? "page" : undefined} class:list={[isCurrent(l.match) && "border-b border-ink pb-[3px]"]}>
+            {l.label}
+          </a>
+        ))
+      }
+      <AccountLink lang={lang} class="text-muted" />
+    </nav>
+    <LanguageSwitch lang={lang} />
+  </div>
+
+  <div class="flex items-center gap-5 md:hidden">
+    <LanguageSwitch lang={lang} />
+    <details class="group">
+      <summary class="eyebrow flex h-11 cursor-pointer list-none items-center [&::-webkit-details-marker]:hidden">
+        <span class="group-open:hidden">{t("nav.menu")}</span>
+        <span class="hidden group-open:inline">{t("nav.close")}</span>
+      </summary>
+      <nav aria-label={t("nav.primary")} class="absolute inset-x-0 top-16 border-y border-line bg-paper px-4 py-2 shadow-[0_12px_24px_-16px_rgba(0,0,0,0.25)]">
+        <ul class="flex flex-col text-[21px]">
+          <li><a class="block border-b border-line py-3.5" href={localizePath("/", lang)}>{t("nav.home")}</a></li>
+          {links.map((l) => <li><a class="block border-b border-line py-3.5" href={l.href}>{l.label}</a></li>)}
+          <li><AccountLink lang={lang} class="block py-3.5 text-muted" /></li>
+        </ul>
+      </nav>
+    </details>
+  </div>
+</header>

@@ -1,0 +1,37 @@
+---
+// One photo of the site: <picture> with WebP (AVIF came out larger at this quality) in several widths (astro:assets), real width/height
+// (no layout shift), lazy by default, alt text in the page language (src/data/photos.ts).
+import { Picture } from "astro:assets";
+import type { Photo as PhotoT } from "../../data/photos";
+import type { Lang } from "../../i18n";
+
+interface Props {
+  photo: PhotoT;
+  lang: Lang;
+  /** CSS `sizes` — how wide the image is drawn, so the browser picks the right file. */
+  sizes: string;
+  widths?: number[];
+  class?: string;
+  /** The LCP image: load now, high priority. */
+  priority?: boolean;
+  /** Decorative copy (e.g. a thumbnail next to the same text): empty alt. */
+  decorative?: boolean;
+}
+
+const { photo, lang, sizes, widths = [400, 640, 900, 1200, 1600], class: className, priority = false, decorative = false } = Astro.props;
+const usable = widths.filter((w) => w <= photo.src.width);
+---
+
+<Picture
+  src={photo.src}
+  alt={decorative ? "" : photo.alt[lang]}
+  formats={["webp"]}
+  widths={usable.length ? usable : [photo.src.width]}
+  sizes={sizes}
+  quality={78}
+  loading={priority ? "eager" : "lazy"}
+  fetchpriority={priority ? "high" : "auto"}
+  decoding={priority ? "sync" : "async"}
+  class:list={["block bg-soft object-cover", photo.gray && "grayscale", className]}
+  style={photo.focus ? `object-position: ${photo.focus}` : undefined}
+/>

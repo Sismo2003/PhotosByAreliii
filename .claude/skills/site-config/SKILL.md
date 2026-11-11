@@ -35,6 +35,17 @@ the template. Never put real data in `site.example.js`.
   No studio address, ever.
 - `SOCIAL` — `instagramHandle`, `instagram` (full URL).
 - `PAYMENTS` — `zelle`, `cashApp`. `""` = unknown → the UI hides that method; never invent one.
+- `AREA` — `region`, `regionCode`, `country`, `areaServed` (cities for local SEO; `[]` = just the region).
+- `BRAND.ownerFullName` — founder in the JSON-LD (`""` = omit).
+
+The landing reads it through `Frontend/src/data/site.ts` with a **namespace import** and defaults, so an
+older `site.js` (e.g. the CI secret) without a new key still builds. Re-encode `SITE_JS_B64` after adding keys.
+
+## `shared/services.js` (exists since 2026-10-26)
+
+Public, tracked: `SERVICES` (slug, `from`, packages with price/minutes), `EXTRAS`, `POLICY` (deposit %,
+cancel hours, late grace, minor age). Same prices as `database/seeds/data/catalog.js` — change both.
+The `services.json` shape below was the first idea; the JS module replaced it.
 
 Everything in it ends up in a browser bundle: **public data only** (no keys, no internal emails).
 

@@ -1,0 +1,81 @@
+---
+// /services — every session with its starting price, the policies, and "Don't see the session…".
+import Layout from "../layouts/Layout.astro";
+import Photo from "../components/site/Photo.astro";
+import PolicyList from "../components/service/PolicyList.astro";
+import { CONTACT, SERVICES, SHARED_VARS } from "../data/site";
+import { SERVICE_PHOTOS } from "../data/photos";
+import { localizePath, useT, type Lang } from "../i18n";
+import { breadcrumbNode, serviceNode } from "../seo/jsonld";
+import { money } from "../utils/money";
+
+const { lang } = Astro.props as { lang: Lang };
+const { t } = useT(lang, SHARED_VARS);
+const site = Astro.site!;
+const L = (p: string) => localizePath(p, lang);
+const email = CONTACT.emails?.primary;
+
+const jsonLd = [
+  breadcrumbNode(site, [
+    { name: t("nav.home"), path: L("/") },
+    { name: t("nav.services"), path: L("/services/") },
+  ]),
+  ...SERVICES.map((s) => serviceNode(site, lang, s.slug, new URL(SERVICE_PHOTOS[s.slug].hero.src.src, site).href)),
+];
+---
+
+<Layout lang={lang} title={t("meta.servicesTitle")} description={t("meta.servicesDescription")} jsonLd={jsonLd}>
+  <section class="page-x container-site pt-8 lg:pt-10">
+    <p class="eyebrow m-0 text-muted">{t("nav.services")}</p>
+    <h1 class="mt-3 mb-4 max-w-[760px] text-[40px] leading-[1.05] font-normal tracking-[-0.02em] lg:text-[64px] lg:leading-[1.02]">{t("servicesPage.h1")}</h1>
+    <p class="m-0 max-w-[640px] text-[19px] leading-[29px] text-muted lg:text-[21px] lg:leading-8">{t("servicesPage.lead")}</p>
+  </section>
+
+  <section class="page-x container-site pt-12 lg:pt-20">
+    <ul class="m-0 list-none border-b border-line p-0">
+      {
+        SERVICES.map((s) => (
+          <li class="grid grid-cols-[96px_minmax(0,1fr)] gap-x-4 gap-y-3 border-t border-line py-6 sm:grid-cols-[140px_minmax(0,1fr)] lg:grid-cols-[180px_minmax(0,1fr)_auto] lg:items-center lg:gap-x-10 lg:py-8">
+            <a href={L(`/services/${s.slug}/`)} tabindex="-1" aria-hidden="true" class="row-span-2 lg:row-span-1">
+              <Photo photo={SERVICE_PHOTOS[s.slug].thumb} lang={lang} decorative sizes="(min-width: 1024px) 180px, 140px" widths={[180, 280, 360]} class="aspect-[4/5] w-full" />
+            </a>
+            <div>
+              <h2 class="m-0 flex flex-wrap items-baseline gap-x-3 text-[26px] leading-tight font-normal lg:text-[32px]">
+                <a href={L(`/services/${s.slug}/`)}>{t(`services.${s.slug}.name`)}</a>
+                <span class="text-[17px] text-muted"><em>{t("common.from")}</em> {money(s.from)}</span>
+              </h2>
+              <p class="mt-2 mb-1 text-[19px] leading-7">{t(`services.${s.slug}.tagline`)}</p>
+              <p class="m-0 text-[15px] text-muted">{t(`services.${s.slug}.short`)}</p>
+            </div>
+            <div class="flex items-center gap-6 lg:justify-end">
+              <a href={L(`/services/${s.slug}/`)} class="link-line">{t("common.viewDetails")}</a>
+              <a href={`${L("/book/")}?service=${s.slug}`} class="btn btn-primary h-10 px-5">{t("common.book")}</a>
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <section id="policies" class="page-x container-site grid gap-6 pt-[72px] lg:grid-cols-[360px_minmax(0,1fr)] lg:gap-[72px] lg:pt-[120px]">
+    <div>
+      <h2 class="eyebrow m-0">{t("servicesPage.policiesTitle")}</h2>
+      <p class="mt-2.5 mb-4 text-[19px] leading-[29px] text-muted">{t("servicesPage.policiesLead")}</p>
+      <a href={L("/policies/")} class="link-line">{t("common.readFullPolicies")}</a>
+    </div>
+    <PolicyList lang={lang} ids={["deposit", "cancelling", "rescheduling", "late", "delivery", "minors"]} />
+  </section>
+
+  <section class="page-x container-site py-[72px] lg:py-[120px]">
+    <div class="flex flex-col gap-6 bg-soft px-6 py-10 lg:flex-row lg:items-center lg:justify-between lg:px-12 lg:py-14">
+      <div>
+        <h2 class="m-0 text-[30px] leading-tight font-normal lg:text-[36px]">{t("servicesPage.customTitle")}</h2>
+        <p class="mt-2 mb-0 text-[19px] text-muted">{t("servicesPage.customLead")}</p>
+      </div>
+      <div class="flex flex-wrap items-center gap-6">
+        {email && <a href={`mailto:${email}`} class="link-line">{t("common.emailMe")}</a>}
+        <a href={L("/book/")} class="btn btn-primary">{t("common.bookSession")}</a>
+      </div>
+    </div>
+  </section>
+</Layout>

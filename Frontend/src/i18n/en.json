@@ -1,0 +1,706 @@
+{
+  "meta": {
+    "homeTitle": "Portrait photographer in {region}",
+    "homeDescription": "Portrait photographer in {region}: graduation, solo, family and couples, maternity, birthday and branding sessions from {from}. Every photo edited, delivered to a private gallery.",
+    "servicesTitle": "Photography sessions and prices",
+    "servicesDescription": "Photography sessions in {region} and their starting prices: graduation {graduation}, solos {solos}, family & couples {familyCouples}, maternity {maternity}, birthdays {birthdays}, branding {branding}.",
+    "serviceTitle": "{name} photography in {region}",
+    "bookTitle": "Book a session",
+    "bookDescription": "Request a photography session with {owner} in {region}. Pick a session, send your preferred date, and {owner} confirms by hand.",
+    "policiesTitle": "Booking policies",
+    "policiesDescription": "Deposit, cancelling, rescheduling, late arrivals and minors: the booking policies for sessions with {brand}.",
+    "privacyTitle": "Privacy policy",
+    "privacyDescription": "How {brand} collects, uses and protects your information on this website, in bookings and in private galleries.",
+    "termsTitle": "Terms of use",
+    "termsDescription": "Terms for using the {brand} website, client galleries and photographs.",
+    "notFoundTitle": "Page not found",
+    "notFoundDescription": "This page doesn’t exist."
+  },
+  "nav": {
+    "skip": "Skip to content",
+    "home": "Home",
+    "portfolio": "Portfolio",
+    "services": "Services",
+    "book": "Book",
+    "clientLogin": "Client login",
+    "myGalleries": "My galleries",
+    "admin": "Admin",
+    "menu": "Menu",
+    "close": "Close",
+    "language": "Language",
+    "primary": "Main",
+    "breadcrumb": "Breadcrumb"
+  },
+  "common": {
+    "from": "from",
+    "fromCap": "From",
+    "bookSession": "Book a session",
+    "bookThis": "Book this session",
+    "bookPackage": "Book {name}",
+    "seeServices": "See services",
+    "allServices": "All services",
+    "viewDetails": "View details",
+    "book": "Book",
+    "fullPortfolio": "Full portfolio",
+    "viewFullPortfolio": "View full portfolio",
+    "seePricing": "See pricing",
+    "includes": "Includes",
+    "pricing": "Pricing",
+    "goodToKnow": "Good to know",
+    "otherSessions": "Other sessions",
+    "whatsIncluded": "What’s included",
+    "whatsIncludedSub": "Everything you need for the session, no surprises.",
+    "recentSessions": "Recent {name} sessions",
+    "beforeSession": "Before your session",
+    "readFullPolicies": "Read the full policies",
+    "emailMe": "Email me"
+  },
+  "goodToKnow": [
+    "These are starting prices — a location that charges a fee or added services can change the total.",
+    "Extra outfit change: +{outfit} each.",
+    "Most sessions run 1–2 hours, and you get every photo, edited.",
+    "A {deposit}% non-refundable deposit secures your date."
+  ],
+  "home": {
+    "eyebrow": "Portrait photographer · {region}",
+    "lead": "Graduations, birthdays, maternity, family, solo and branding portraits. Photos that feel like <em>you</em> — taken with <em>care</em>, delivered to your own <em>private gallery</em>.",
+    "momentsTitle": "Moments",
+    "momentsLead": "A few favorite frames — <em>scroll</em> to flip through them.",
+    "play": "Play",
+    "pause": "Pause",
+    "prev": "Previous photo",
+    "next": "Next photo",
+    "showPhoto": "Show photo {n}: {alt}",
+    "portfolioTitle": "Portfolio",
+    "portfolioLead": "Recent sessions, <em>mostly golden hour</em>.",
+    "filterAll": "All",
+    "filters": "Filter the portfolio",
+    "servicesTitle": "Services"
+  },
+  "categories": {
+    "graduation": "Graduation",
+    "solos": "Solos",
+    "family": "Family",
+    "couples": "Couples",
+    "maternity": "Maternity",
+    "birthday": "Birthday",
+    "party": "Party",
+    "branding": "Branding"
+  },
+  "servicesPage": {
+    "h1": "Sessions for the days worth keeping.",
+    "lead": "Starting prices. Most sessions run 1–2 hours, and every session includes posing guidance and every photo, edited.",
+    "policiesTitle": "Policies",
+    "policiesLead": "We are all humans and things happen — I understand.",
+    "customTitle": "Don’t see the session you want?",
+    "customLead": "Reach out — tell me what you have in mind and we’ll plan it together."
+  },
+  "services": {
+    "graduation": {
+      "name": "Graduation",
+      "tagline": "Cap, gown, stole and the campus that got you here.",
+      "short": "1–2 hours · campus or a spot you love · every photo edited",
+      "intro": "For high school, college and every first-generation milestone. We shoot on your campus, in your colors, with your people if you want them there.",
+      "fact": "Graduation sessions with {brand} start at {price} and run 1–2 hours on your campus or a spot you love, with every photo delivered edited.",
+      "included": [
+        "1–2 hours on campus or a spot you love",
+        "Cap, gown, stole, cords and diploma shots",
+        "Family and friends welcome to join",
+        "Every photo delivered edited",
+        "Extra outfit changes +{outfit} each",
+        "Private online gallery"
+      ],
+      "extraGoodToKnow": [],
+      "before": [
+        {
+          "title": "Book early",
+          "text": "Graduation season fills up fast — book with enough time to get your photos back before you need them."
+        },
+        {
+          "title": "Bring it all",
+          "text": "Cap, gown, stole, cords, and anything with your school colors."
+        },
+        {
+          "title": "Golden hour",
+          "text": "We start about an hour before sunset for warm, soft light."
+        }
+      ],
+      "ready": "Ready for your <em>graduation</em> photos?",
+      "packages": {
+        "graduation": {
+          "name": "Graduation session",
+          "note": "1–2 hours · every photo edited · extra outfit changes +{outfit}"
+        }
+      }
+    },
+    "solos": {
+      "name": "Solos",
+      "tagline": "Just you, in your best light.",
+      "short": "1–2 hours · studio or location · every photo edited",
+      "intro": "Just you. Birthdays, milestones, a new look or simply because — portraits that feel like you, in the studio or on location.",
+      "fact": "Solo portrait sessions with {brand} start at {price} and run 1–2 hours in the studio or on location, with posing guidance and every photo edited.",
+      "included": [
+        "1–2 hours, studio or location",
+        "Posing guidance the whole session",
+        "For birthdays, milestones or just because",
+        "Every photo delivered edited",
+        "Extra outfit changes +{outfit} each",
+        "Private online gallery"
+      ],
+      "extraGoodToKnow": [],
+      "before": [
+        {
+          "title": "Plan your outfits",
+          "text": "Bring a couple of looks — each extra change is +{outfit}."
+        },
+        {
+          "title": "Send me inspo",
+          "text": "Screenshots or Pinterest boards help me plan your poses."
+        },
+        {
+          "title": "Golden hour",
+          "text": "We start about an hour before sunset for warm, soft light."
+        }
+      ],
+      "ready": "Ready for your <em>solo</em> photos?",
+      "packages": {
+        "solo": {
+          "name": "Solo session",
+          "note": "1–2 hours · every photo edited · extra outfit changes +{outfit}"
+        }
+      }
+    },
+    "family-couples": {
+      "name": "Family & couples",
+      "tagline": "Everyone in one frame, abuelos too.",
+      "short": "1–2 hours · couples, families and kids · every photo edited",
+      "intro": "Family portraits, engagements and anniversaries — relaxed, a little guided, and full of the people who matter most.",
+      "fact": "Couples sessions with {brand} start at {couples} and family sessions at {family}; both run 1–2 hours at one location with every photo edited.",
+      "included": [
+        "1–2 hours at one location",
+        "Couples, families, kids and grandparents",
+        "Group, couple and individual shots",
+        "Every photo delivered edited",
+        "Extra outfit changes +{outfit} each",
+        "Private online gallery"
+      ],
+      "extraGoodToKnow": [],
+      "before": [
+        {
+          "title": "Coordinate, don’t match",
+          "text": "Pick 2–3 colors and let everyone choose within them."
+        },
+        {
+          "title": "Bring snacks",
+          "text": "Little ones last longer with a treat in the car."
+        },
+        {
+          "title": "Sunset spots",
+          "text": "Lost Dutchman and the desert glow at the end of the day."
+        }
+      ],
+      "ready": "Ready for your <em>family</em> photos?",
+      "packages": {
+        "couples": {
+          "name": "Couples",
+          "note": "The two of you · 1–2 hours · every photo edited"
+        },
+        "family": {
+          "name": "Family",
+          "note": "The whole family · 1–2 hours · every photo edited"
+        }
+      }
+    },
+    "maternity": {
+      "name": "Maternity",
+      "tagline": "Before the little one arrives.",
+      "short": "1–2 hours · desert or studio · every photo edited",
+      "intro": "Soft, unhurried portraits between 28 and 36 weeks — just you, or with your partner and kids. Desert at golden hour or the studio.",
+      "fact": "Maternity sessions with {brand} start at {price}, run 1–2 hours in the desert or the studio, and are best booked for 28–36 weeks.",
+      "included": [
+        "1–2 hours, desert or studio",
+        "Partner and kids welcome",
+        "Belly, ultrasound and detail shots",
+        "Every photo delivered edited",
+        "Extra outfit changes +{outfit} each",
+        "Private online gallery"
+      ],
+      "extraGoodToKnow": [],
+      "before": [
+        {
+          "title": "Best timing",
+          "text": "Book for 28–36 weeks, when you still feel comfortable."
+        },
+        {
+          "title": "Wear something flowing",
+          "text": "Long dresses move beautifully in the desert wind."
+        },
+        {
+          "title": "Take breaks",
+          "text": "We go at your pace; there is shade and water."
+        }
+      ],
+      "ready": "Ready for your <em>maternity</em> photos?",
+      "packages": {
+        "maternity": {
+          "name": "Maternity session",
+          "note": "1–2 hours · every photo edited · extra outfit changes +{outfit}"
+        }
+      }
+    },
+    "birthdays-parties": {
+      "name": "Birthdays & parties",
+      "tagline": "The balloons, the cake and everyone who came to celebrate.",
+      "short": "1–2 hours · studio or location · every photo edited",
+      "intro": "Birthdays at every age — first, sweet sixteen, 21st, 60th — and the parties around them. In the studio with balloons and backdrops, outdoors at golden hour, or right at your celebration with your guests.",
+      "fact": "Birthday portrait sessions with {brand} start at {birthday}; party sessions start at {party} for 90 minutes with your guests, and every extra 30 minutes is +{extra30}.",
+      "included": [
+        "Studio or location, 1–2 hours",
+        "Balloons, backdrop and set styling in studio",
+        "Portraits, cake and detail shots",
+        "Party sessions: photos with your guests and hosts",
+        "Every photo delivered edited",
+        "Private online gallery"
+      ],
+      "extraGoodToKnow": [
+        "Party price may change depending on the size of the party."
+      ],
+      "before": [
+        {
+          "title": "Plan the look",
+          "text": "Send me your colors and theme so I can style the set before you arrive."
+        },
+        {
+          "title": "Bring the details",
+          "text": "Numbers, crowns, cake, flowers — anything that tells your story."
+        },
+        {
+          "title": "Party timeline",
+          "text": "Send me the schedule so I catch the cake, the candles and your favorite people."
+        }
+      ],
+      "ready": "Ready for your <em>birthday</em> photos?",
+      "packages": {
+        "birthday": {
+          "name": "Birthday",
+          "note": "Portrait session · studio or location · every photo edited"
+        },
+        "party": {
+          "name": "Party",
+          "note": "90 min at your party · photos with guests and hosts · +{extra30} every extra 30 min"
+        }
+      }
+    },
+    "branding": {
+      "name": "Branding",
+      "tagline": "Photos that make your business look like you.",
+      "short": "1–2 hours · studio or your space · every photo edited",
+      "intro": "Photos for your business — headshots, products and the details that make your brand yours. Ready for your website and social media.",
+      "fact": "Branding sessions with {brand} start at {price} and include headshots, product and detail shots in 1–2 hours, ready for your website and social media.",
+      "included": [
+        "1–2 hours, studio or your space",
+        "Headshots and portraits for your business",
+        "Product and detail shots",
+        "Photos ready for your website and social media",
+        "Every photo delivered edited",
+        "Extra outfit changes +{outfit} each"
+      ],
+      "extraGoodToKnow": [],
+      "before": [
+        {
+          "title": "Know your brand",
+          "text": "Send me your colors and where the photos will live."
+        },
+        {
+          "title": "Bring your products",
+          "text": "Anything you sell or use every day tells your story."
+        },
+        {
+          "title": "Plan your looks",
+          "text": "Two or three outfits give you variety for months of posts."
+        }
+      ],
+      "ready": "Ready for your <em>branding</em> photos?",
+      "packages": {
+        "branding": {
+          "name": "Branding session",
+          "note": "Portraits and product shots · 1–2 hours · every photo edited"
+        }
+      }
+    }
+  },
+  "extras": {
+    "outfit": "Extra outfit change",
+    "extra30": "Extra 30 minutes · party sessions"
+  },
+  "policies": {
+    "h1": "Booking policies",
+    "lead": "We are all humans and things happen — I understand. Here is how booking works.",
+    "updated": "Last updated {date}",
+    "items": [
+      {
+        "id": "deposit",
+        "title": "Deposit",
+        "q": "Do I need a deposit to book?",
+        "text": "A {deposit}% deposit is required to secure your session — no deposit, no session secured. The deposit is non-refundable."
+      },
+      {
+        "id": "cancelling",
+        "title": "Cancelling",
+        "q": "How much notice do I need to cancel?",
+        "text": "Please let me know at least {hours} hours before your session."
+      },
+      {
+        "id": "rescheduling",
+        "title": "Rescheduling",
+        "q": "Can I reschedule my session?",
+        "text": "Your {deposit}% deposit is applied to the rescheduled session — once. If the rescheduled session is canceled, you’ll need to book a new session."
+      },
+      {
+        "id": "late",
+        "title": "Running late",
+        "q": "What happens if I’m late?",
+        "text": "There’s a {minutes}-minute grace period. After that it counts as a no-show and the deposit can’t be applied to another session. Please message me as soon as you can."
+      },
+      {
+        "id": "delivery",
+        "title": "Getting your photos",
+        "q": "When should I book to get my photos in time?",
+        "text": "Book with enough time to get your photos back by the date you need them. Every photo is delivered edited, in a private online gallery."
+      },
+      {
+        "id": "minors",
+        "title": "Minors",
+        "q": "Can minors book a session?",
+        "text": "Sessions for anyone under {age} need a parent or guardian’s consent."
+      },
+      {
+        "id": "payments",
+        "title": "Payments",
+        "q": "How do I pay?",
+        "text": "Payments are made directly to {owner} (for example Zelle, Cash App or cash) and recorded by hand. This website never asks for card details."
+      },
+      {
+        "id": "sharing",
+        "title": "Sharing your photos",
+        "q": "Will my photos be posted online?",
+        "text": "Only with your permission. When you book you can say whether your photos may be shared on {brand}’s social media and website, and anything you don’t want posted (for example, kids’ faces)."
+      }
+    ]
+  },
+  "privacy": {
+    "h1": "Privacy policy",
+    "updated": "Last updated {date}",
+    "intro": "This policy explains what information {legal} (“we”) collects through this website, the client portal and bookings, and how it is used. We keep it short and we don’t sell your data.",
+    "sections": [
+      {
+        "title": "What we collect",
+        "items": [
+          "Contact details you send us: name, email, phone number and the details of the session you want.",
+          "Booking information: session type, date, location, notes, and whether your photos may be shared.",
+          "Client accounts: your sign-in email or phone and a securely hashed password.",
+          "Your photos, stored privately on our own server for the time your gallery is open."
+        ]
+      },
+      {
+        "title": "How we use it",
+        "items": [
+          "To answer you, confirm and run your session, and deliver your gallery.",
+          "To send emails about your booking and gallery (for example, a reminder before your gallery closes).",
+          "We never sell or rent your information, and we don’t use advertising trackers."
+        ]
+      },
+      {
+        "title": "Cookies",
+        "items": [
+          "Signing in sets one secure, http-only session cookie that keeps you logged in. It is not used for tracking.",
+          "Your language choice is remembered in your browser so the site opens in the language you picked."
+        ]
+      },
+      {
+        "title": "Your photos and galleries",
+        "items": [
+          "Galleries are private: only you (with your sign-in or the gallery password) and {owner} can see them.",
+          "Photos are deleted when your gallery expires; we email you before that happens so you can download them.",
+          "We only post your photos publicly if you gave permission when booking."
+        ]
+      },
+      {
+        "title": "Your choices",
+        "items": [
+          "You can ask for a copy of your information, ask us to correct it, or ask us to delete it by writing to {email}.",
+          "Some records (like payments) may be kept as long as the law requires."
+        ]
+      },
+      {
+        "title": "Children",
+        "items": [
+          "Sessions for anyone under {age} need a parent or guardian’s consent, and the booking is made by the adult."
+        ]
+      },
+      {
+        "title": "Contact",
+        "items": [
+          "Questions about this policy: {email}."
+        ]
+      }
+    ]
+  },
+  "terms": {
+    "h1": "Terms of use",
+    "updated": "Last updated {date}",
+    "intro": "By using this website or a client gallery you agree to these terms.",
+    "sections": [
+      {
+        "title": "Bookings",
+        "items": [
+          "Sending a request does not reserve a date: {owner} confirms every booking by hand, and the session is secured once the deposit is received.",
+          "Prices on this site are starting prices; a location fee or added services can change the total.",
+          "The booking policies are part of these terms."
+        ]
+      },
+      {
+        "title": "Photographs and copyright",
+        "items": [
+          "All photographs on this site and in client galleries are © {legal}. Copyright stays with {legal}.",
+          "Clients receive a personal-use license for their own gallery: print and share them with friends and family, and post them on your social media with credit (@{instagram}).",
+          "Commercial use, editing or applying filters to the delivered photos, or selling them, needs written permission. Branding sessions include use for your own business."
+        ]
+      },
+      {
+        "title": "Client accounts and galleries",
+        "items": [
+          "Keep your sign-in and gallery password private. Galleries are available for a limited time; download your photos before they expire."
+        ]
+      },
+      {
+        "title": "The website",
+        "items": [
+          "The content of this site may not be copied or reused without permission. We may update these terms; the date above shows the latest version."
+        ]
+      },
+      {
+        "title": "Contact",
+        "items": [
+          "{email}"
+        ]
+      }
+    ]
+  },
+  "book": {
+    "h1": "Book a session",
+    "stepOf": "Step {n} of 5",
+    "steps": {
+      "session": "Session",
+      "date": "Date & time",
+      "location": "Location",
+      "details": "Your details",
+      "review": "Review & send"
+    },
+    "nav": {
+      "back": "Back",
+      "continue": "Continue"
+    },
+    "s1": {
+      "h1": "What are we <em>celebrating?</em>",
+      "lead": "Pick a session. You can add extras below.",
+      "package": "Package",
+      "extras": "Extras",
+      "optional": "optional",
+      "less": "One less: {name}",
+      "more": "One more: {name}"
+    },
+    "s2": {
+      "h1": "Pick a <em>date.</em>",
+      "lead": "Available days are outlined. Evenings book fast in spring and fall.",
+      "prev": "Previous month",
+      "next": "Next month",
+      "pickDay": "Choose an outlined day to see its times.",
+      "sunset": "Sunset is at about {time}. I recommend starting an hour before for golden light.",
+      "noDays": "No open dates this month. Try the next one, or message me.",
+      "taken": "Taken",
+      "loading": "Loading the dates…",
+      "error": "I couldn’t load the dates.",
+      "retry": "Try again"
+    },
+    "s3": {
+      "h1": "Where should we <em>shoot?</em>",
+      "lead": "Pick one of my favorite spots, the studio, or tell me yours.",
+      "park": {
+        "name": "Lost Dutchman State Park",
+        "text": "Desert and the Superstition Mountains.",
+        "tag": "Some parks charge an entry fee"
+      },
+      "campus": {
+        "name": "Campus",
+        "text": "Your school — ASU, GCU, NAU or your high school.",
+        "tag": "Great for grads"
+      },
+      "studio": {
+        "name": "Studio",
+        "text": "Backdrops, balloons, indoor light.",
+        "tag": "Any weather"
+      },
+      "other": "Somewhere else",
+      "campusField": "Which campus?",
+      "campusHint": "e.g. ASU Tempe",
+      "otherField": "Place or address",
+      "otherHint": "e.g. my grandparents’ ranch in Queen Creek",
+      "fee": "If a location requires a fee, it’s added to your total — I’ll let you know before I confirm."
+    },
+    "s4": {
+      "h1": "A little about <em>you.</em>",
+      "lead": "This email becomes your login for the private gallery.",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "email": "Email",
+      "phone": "Phone",
+      "people": "How many people?",
+      "peopleOptions": {
+        "JUST_ME": "Just me",
+        "TWO": "2",
+        "THREE_TO_FIVE": "3–5",
+        "SIX_TO_EIGHT": "6–8"
+      },
+      "heard": "How did you find me?",
+      "heardOptions": {
+        "INSTAGRAM": "Instagram",
+        "FRIEND": "A friend",
+        "GOOGLE": "Google",
+        "TIKTOK": "TikTok",
+        "RETURNING_CLIENT": "I’ve booked before",
+        "OTHER": "Other"
+      },
+      "choose": "Choose one",
+      "school": "School & colors",
+      "schoolHint": "e.g. ASU · maroon and gold",
+      "when": "When do you need your photos?",
+      "inspo": "Inspo · links or ideas",
+      "inspoHint": "Pinterest, Instagram or a few words",
+      "share": "Can I share your photos?",
+      "shareOptions": {
+        "YES": "Yes, you can post them",
+        "PARTIAL": "Yes, but not everything",
+        "NO": "No, keep them private"
+      },
+      "noShare": "Anything you don’t want posted?",
+      "noShareHint": "e.g. kids’ faces",
+      "notes": "Anything I should know?",
+      "notesHint": "Ideas, poses you love, props you’re bringing…",
+      "minor": "This session is for someone under {age}, and I’m their parent or guardian. I give my consent.",
+      "optional": "optional",
+      "website": "Leave this field empty"
+    },
+    "s5": {
+      "h1": "Review and <em>send.</em>",
+      "lead": "Check everything and send your request. Nothing is charged today.",
+      "edit": "Edit",
+      "client": "Client",
+      "how": "How it works from here",
+      "howItems": [
+        {
+          "title": "I review your request",
+          "text": "Within {hours} hours I confirm your date — or suggest another time if it’s taken."
+        },
+        {
+          "title": "You send the deposit",
+          "text": "Send your {deposit}% deposit and a screenshot of the payment — no deposit, no session secured."
+        },
+        {
+          "title": "Your date is locked",
+          "text": "Once the deposit arrives, the date is yours. The rest is paid on the session day."
+        }
+      ],
+      "policy": "Booking policy",
+      "accept": "I’ve read and agree to the booking policy.",
+      "noPayment": "No payment today",
+      "send": "Send request",
+      "sending": "Sending…"
+    },
+    "done": {
+      "eyebrow": "Request sent",
+      "requestNo": "Request no. {code}",
+      "h1": "Request sent, {name}",
+      "when": "{date} at {time} · {place}.",
+      "reply": "I’ll review it and reply within {hours} hours. Nothing is charged yet.",
+      "steps": [
+        {
+          "title": "I confirm your date",
+          "text": "You’ll get an email at {email} — or a suggestion for another time if that slot is taken."
+        },
+        {
+          "title": "Send the deposit",
+          "text": "The email explains how to send the {deposit}% deposit ({amount}). No deposit, no session secured — and the deposit is non-refundable."
+        },
+        {
+          "title": "You’re booked",
+          "text": "When the deposit arrives your date is locked and I send a short guide: what to wear, what to bring, where we meet."
+        },
+        {
+          "title": "Your gallery",
+          "text": "Your edited photos arrive in your private gallery — by the date you need them, if you book with enough time."
+        }
+      ],
+      "back": "Back to site",
+      "services": "See services"
+    },
+    "summary": {
+      "title": "Your booking",
+      "session": "Session",
+      "extras": "Extras",
+      "date": "Date",
+      "location": "Location",
+      "total": "Total",
+      "deposit": "{deposit}% deposit after I confirm",
+      "balance": "Balance on session day",
+      "notYet": "Not chosen yet",
+      "questions": "Questions first? Email {email} — I reply within a day."
+    },
+    "errors": {
+      "fix": "Please check the highlighted fields.",
+      "session": "Choose a session.",
+      "package": "Choose a package.",
+      "date": "Choose a day and a time.",
+      "place": "Tell me the place.",
+      "firstName": "Enter your first name.",
+      "lastName": "Enter your last name.",
+      "email": "Enter a valid email, like you@email.com.",
+      "phone": "Enter a complete phone number, like (480) 555-0123.",
+      "photosBy": "Choose a date from today on.",
+      "tooLong": "This is too long.",
+      "policy": "Please accept the booking policy.",
+      "taken": "That time was just taken. Please pick another one.",
+      "notOffered": "That time is no longer available. Please pick another one.",
+      "catalogChanged": "The sessions changed while you were booking. Please check your choice.",
+      "rateLimited": "Too many requests from this connection. Try again later, or message me directly.",
+      "generic": "Something went wrong sending your request. Please try again, or message me directly.",
+      "offline": "I couldn’t reach the server. Check your connection and try again."
+    },
+    "fallback": {
+      "title": "Online booking isn’t available right now.",
+      "text": "You can still request a date by message — I reply within a day.",
+      "retry": "Try again"
+    },
+    "text": "Text",
+    "email": "Email",
+    "instagram": "Instagram DM",
+    "message": {
+      "hello": "Hi {owner}! I’d like to book a session."
+    }
+  },
+  "footer": {
+    "about": "Portrait photography in {region}. Graduations, solos, birthdays, maternity, family and branding.",
+    "contact": "Contact",
+    "pages": "Pages",
+    "services": "Services",
+    "privacy": "Privacy",
+    "terms": "Terms",
+    "policies": "Policies",
+    "rights": "All rights reserved."
+  },
+  "notFound": {
+    "h1": "This page doesn’t exist.",
+    "lead": "It may have moved. Try the home page or the services.",
+    "home": "Go home"
+  }
+}

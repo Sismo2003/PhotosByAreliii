@@ -1,0 +1,19 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { localizePath, useT, type Lang } from "../i18n";
+
+const { lang } = Astro.props as { lang: Lang };
+const { t } = useT(lang);
+---
+
+<Layout lang={lang} title={t("meta.notFoundTitle")} description={t("meta.notFoundDescription")} alternates={false} noindex>
+  <section class="page-x container-site py-24 lg:py-40">
+    <p class="eyebrow m-0 text-muted">404</p>
+    <h1 class="mt-3 mb-4 text-[40px] leading-[1.05] font-normal lg:text-[56px]">{t("notFound.h1")}</h1>
+    <p class="mt-0 mb-8 text-[19px] text-muted">{t("notFound.lead")}</p>
+    <div class="flex flex-wrap items-center gap-6">
+      <a href={localizePath("/", lang)} class="btn btn-primary">{t("notFound.home")}</a>
+      <a href={localizePath("/services/", lang)} class="link-line">{t("common.seeServices")}</a>
+    </div>
+  </section>
+</Layout>

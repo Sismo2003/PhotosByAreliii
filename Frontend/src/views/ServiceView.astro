@@ -1,0 +1,136 @@
+---
+// /services/<slug> — one page per service (Service*.dc.html): hero with price, what's included,
+// pricing + good to know, recent sessions, before your session, CTA, other sessions.
+import Layout from "../layouts/Layout.astro";
+import Photo from "../components/site/Photo.astro";
+import ServiceRows from "../components/site/ServiceRows.astro";
+import { SHARED_VARS, serviceBySlug } from "../data/site";
+import { SERVICE_PHOTOS } from "../data/photos";
+import { localizePath, useT, type Lang } from "../i18n";
+import { breadcrumbNode, serviceNode } from "../seo/jsonld";
+import { money } from "../utils/money";
+
+const { lang, slug } = Astro.props as { lang: Lang; slug: string };
+const service = serviceBySlug(slug)!;
+const photos = SERVICE_PHOTOS[slug];
+const { t, tl } = useT(lang, { ...SHARED_VARS, price: money(service.from) });
+const site = Astro.site!;
+const L = (p: string) => localizePath(p, lang);
+const k = (key: string) => `services.${slug}.${key}`;
+const name = t(k("name"));
+const bookHref = (pkg?: string) => `${L("/book/")}?service=${slug}${pkg ? `&package=${pkg}` : ""}`;
+const goodToKnow = [...tl<string[]>("goodToKnow"), ...tl<string[]>(k("extraGoodToKnow"))];
+const before = tl<{ title: string; text: string }[]>(k("before"));
+const multi = service.packages.length > 1;
+
+const jsonLd = [
+  serviceNode(site, lang, slug, new URL(photos.hero.src.src, site).href),
+  breadcrumbNode(site, [
+    { name: t("nav.home"), path: L("/") },
+    { name: t("nav.services"), path: L("/services/") },
+    { name, path: L(`/services/${slug}/`) },
+  ]),
+];
+const label = "eyebrow";
+---
+
+<Layout lang={lang} title={t("meta.serviceTitle", { name: lang === "es" ? name.toLocaleLowerCase("es") : name })} description={t(k("fact"))} jsonLd={jsonLd} image={photos.hero.src}>
+  <nav aria-label={t("nav.breadcrumb")} class="page-x container-site eyebrow flex gap-2.5 pt-2 text-muted">
+    <a href={L("/services/")}>{t("nav.services")}</a><span aria-hidden="true">/</span><span class="text-ink" aria-current="page">{name}</span>
+  </nav>
+
+  <section class="container-site lg:page-x grid gap-8 pt-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,620px)] lg:items-end lg:gap-[72px] lg:pt-10">
+    <div class="page-x order-2 lg:order-1 lg:px-0 lg:pb-2">
+      <h1 class="mt-0 mb-5 text-[44px] leading-[1.02] font-normal tracking-[-0.02em] lg:text-[64px]">{name}</h1>
+      <p class="mt-0 mb-7 text-[19px] leading-[29px] lg:text-[21px] lg:leading-8">{t(k("intro"))}</p>
+      <div class="mb-8 flex gap-8 border-y border-line py-[18px]">
+        <div>
+          <div class:list={[label, "text-muted"]}>{t("common.fromCap")}</div>
+          <div class="mt-1 text-[28px]">{money(service.from)}</div>
+        </div>
+        <div>
+          <div class:list={[label, "text-muted"]}>{t("common.includes")}</div>
+          <div class="mt-2 text-[17px] lg:text-lg">{t(k("short"))}</div>
+        </div>
+      </div>
+      <div class="flex flex-wrap items-center gap-7">
+        <a href={bookHref()} class="btn btn-primary">{t("common.bookThis")}</a>
+        <a href="#pricing" class="link-line">{t("common.seePricing")}</a>
+      </div>
+    </div>
+    <Photo photo={photos.hero} lang={lang} priority sizes="(min-width: 1024px) 620px, 100vw" widths={[390, 620, 800, 1240]} class="order-1 h-[480px] w-full lg:order-2 lg:h-[720px]" />
+  </section>
+
+  <section class="page-x container-site grid gap-6 pt-[72px] lg:grid-cols-[360px_minmax(0,1fr)] lg:gap-[72px] lg:pt-[120px]">
+    <div>
+      <h2 class="eyebrow m-0">{t("common.whatsIncluded")}</h2>
+      <p class="mt-2.5 mb-0 text-[19px] leading-[29px] text-muted">{t("common.whatsIncludedSub")}</p>
+    </div>
+    <ul class="m-0 grid list-none border-b border-line p-0 text-lg sm:grid-cols-2 sm:gap-x-10">
+      {tl<string[]>(k("included")).map((item) => <li class="flex gap-3.5 border-t border-line py-3.5"><span class="text-muted" aria-hidden="true">—</span><span>{item}</span></li>)}
+    </ul>
+  </section>
+
+  <section id="pricing" class="page-x container-site scroll-mt-6 pt-[72px] lg:pt-[120px]">
+    <h2 class="eyebrow mt-0 mb-3">{t("common.pricing")}</h2>
+    <p class="mt-0 mb-6 max-w-[760px] text-[17px] leading-relaxed text-muted">{t(k("fact"))}</p>
+    <div class:list={["grid gap-5", multi ? "lg:grid-cols-3" : "md:grid-cols-2"]}>
+      {
+        service.packages.map((p) => (
+          <div class="flex flex-col gap-2.5 border border-line p-7 pb-8">
+            <h3 class="eyebrow m-0">{t(k(`packages.${p.key}.name`))}</h3>
+            <div class="text-[44px] leading-none"><span class="text-base text-muted italic">{t("common.from")} </span>{money(p.price)}</div>
+            <div class="text-muted">{t(k(`packages.${p.key}.note`))}</div>
+            <a href={bookHref(p.key)} class="btn btn-primary mt-3.5 self-start">
+              {multi ? t("common.bookPackage", { name: t(k(`packages.${p.key}.name`)) }) : t("common.bookThis")}
+            </a>
+          </div>
+        ))
+      }
+      <div class="flex flex-col gap-3 bg-soft p-7">
+        <h3 class="eyebrow m-0">{t("common.goodToKnow")}</h3>
+        <ul class="m-0 flex flex-col gap-1.5 pl-[18px] text-base leading-6">
+          {goodToKnow.map((g) => <li>{g}</li>)}
+        </ul>
+        <a href={L("/policies/")} class="link-line mt-2 self-start">{t("common.readFullPolicies")}</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="page-x container-site pt-[72px] lg:pt-[120px]">
+    <div class="mb-6 flex items-baseline justify-between gap-4">
+      <h2 class="eyebrow m-0">{t("common.recentSessions", { name })}</h2>
+      <a href={L("/") + "#portfolio"} class="link-line shrink-0">{t("common.fullPortfolio")}</a>
+    </div>
+    <div class="grid grid-cols-2 gap-3 lg:grid-cols-3 lg:gap-4">
+      {photos.gallery.map((ph) => <Photo photo={ph} lang={lang} sizes="(min-width: 1024px) 395px, 50vw" widths={[300, 400, 600, 800]} class="h-[240px] w-full lg:h-[360px]" />)}
+    </div>
+  </section>
+
+  <section class="page-x container-site pt-[72px] lg:pt-[120px]">
+    <h2 class="eyebrow mt-0 mb-7">{t("common.beforeSession")}</h2>
+    <ol class="m-0 grid list-none gap-8 p-0 md:grid-cols-3 lg:gap-12">
+      {
+        before.map((b, i) => (
+          <li class="flex flex-col gap-2">
+            <span class="text-[28px] text-muted italic" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
+            <h3 class="m-0 text-[22px] font-normal">{b.title}</h3>
+            <p class="m-0 text-muted">{b.text}</p>
+          </li>
+        ))
+      }
+    </ol>
+  </section>
+
+  <section class="page-x container-site pt-[72px] lg:pt-[120px]">
+    <div class="flex flex-col gap-6 bg-soft px-6 py-10 sm:flex-row sm:items-center sm:justify-between lg:px-12 lg:py-14">
+      <h2 class="m-0 text-[30px] leading-[1.15] font-normal lg:text-[36px]" set:html={t(k("ready"))} />
+      <a href={bookHref()} class="btn btn-primary self-start sm:self-auto">{t("common.bookThis")}</a>
+    </div>
+  </section>
+
+  <section class="page-x container-site grid gap-4 pt-16 pb-[72px] lg:grid-cols-[360px_minmax(0,1fr)] lg:gap-[72px] lg:pt-24 lg:pb-[120px]">
+    <h2 class="eyebrow m-0">{t("common.otherSessions")}</h2>
+    <ServiceRows lang={lang} exclude={slug} />
+  </section>
+</Layout>

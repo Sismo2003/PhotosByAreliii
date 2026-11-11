@@ -1,0 +1,35 @@
+---
+// /policies — the booking policy ("la póliza"), from Photos By Areliii LLC.pdf. Also an FAQPage in
+// JSON-LD: answer engines quote these answers directly.
+import Layout from "../layouts/Layout.astro";
+import PolicyList from "../components/service/PolicyList.astro";
+import { LEGAL_UPDATED, SHARED_VARS } from "../data/site";
+import { localizePath, useT, type Lang } from "../i18n";
+import { breadcrumbNode, faqNode } from "../seo/jsonld";
+import { formatLongDate } from "../utils/date";
+
+const { lang } = Astro.props as { lang: Lang };
+const { t, tl } = useT(lang, SHARED_VARS);
+const site = Astro.site!;
+const L = (p: string) => localizePath(p, lang);
+const jsonLd = [
+  faqNode(tl<{ q: string; text: string }[]>("policies.items")),
+  breadcrumbNode(site, [
+    { name: t("nav.home"), path: L("/") },
+    { name: t("policies.h1"), path: L("/policies/") },
+  ]),
+];
+---
+
+<Layout lang={lang} title={t("meta.policiesTitle")} description={t("meta.policiesDescription")} jsonLd={jsonLd}>
+  <section class="page-x container-site max-w-[1000px] pt-8 pb-[72px] lg:pt-10 lg:pb-[120px]">
+    <h1 class="mt-0 mb-4 text-[40px] leading-[1.05] font-normal tracking-[-0.02em] lg:text-[56px]">{t("policies.h1")}</h1>
+    <p class="mt-0 mb-2 max-w-[640px] text-[19px] leading-[29px] lg:text-[21px] lg:leading-8">{t("policies.lead")}</p>
+    <p class="eyebrow mt-0 mb-10 text-muted">{t("policies.updated", { date: formatLongDate(LEGAL_UPDATED, lang) })}</p>
+    <PolicyList lang={lang} headingLevel="h2" />
+    <div class="mt-10 flex flex-wrap items-center gap-6">
+      <a href={L("/book/")} class="btn btn-primary">{t("common.bookSession")}</a>
+      <a href={L("/services/")} class="link-line">{t("common.seeServices")}</a>
+    </div>
+  </section>
+</Layout>

@@ -1,0 +1,27 @@
+---
+// The booking policies as a definition list (Services.dc.html "Policies"). Text in i18n, numbers in
+// shared/services.js (POLICY). `ids` limits which ones show.
+import { SHARED_VARS } from "../../data/site";
+import { useT, type Lang } from "../../i18n";
+
+interface Props {
+  lang: Lang;
+  ids?: string[];
+  headingLevel?: "h2" | "h3";
+}
+const { lang, ids, headingLevel = "h3" } = Astro.props;
+const { tl } = useT(lang, SHARED_VARS);
+const items = tl<{ id: string; title: string; text: string }[]>("policies.items").filter((p) => !ids || ids.includes(p.id));
+const H = headingLevel;
+---
+
+<dl class="m-0 grid gap-x-12 border-b border-line md:grid-cols-2">
+  {
+    items.map((p) => (
+      <div id={p.id} class="flex scroll-mt-6 flex-col gap-1.5 border-t border-line py-5">
+        <dt><H class="eyebrow m-0">{p.title}</H></dt>
+        <dd class="m-0 text-[17px] leading-relaxed">{p.text}</dd>
+      </div>
+    ))
+  }
+</dl>

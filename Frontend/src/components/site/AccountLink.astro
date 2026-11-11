@@ -1,0 +1,37 @@
+---
+// "Client login" → the ONE sign-in page (/login, served by client/; it redirects by role).
+// When a session already exists (httpOnly cookie, same origin), a tiny script asks the API who it is
+// and turns the link into "My galleries" (/client/) or "Admin" (/admin/). No token is ever read by JS.
+import { useT, type Lang } from "../../i18n";
+
+const { lang, class: className } = Astro.props as { lang: Lang; class?: string };
+const { t } = useT(lang);
+---
+
+<a
+  href="/login"
+  rel="nofollow"
+  data-account
+  data-label-client={t("nav.myGalleries")}
+  data-label-admin={t("nav.admin")}
+  class={className}>{t("nav.clientLogin")}</a
+>
+
+<script>
+  // One request per page, shared by every AccountLink on it (header + mobile menu + footer).
+  type Me = { role?: string } | null;
+  const w = window as Window & { __pbaMe?: Promise<Me> };
+  w.__pbaMe ??= fetch("/api/auth/me", { credentials: "same-origin", headers: { Accept: "application/json" } })
+    .then((r) => (r.ok ? r.json() : null))
+    .then((body) => (body && !body.error ? body.data : null))
+    .catch(() => null);
+
+  w.__pbaMe.then((me) => {
+    if (!me?.role) return;
+    const admin = me.role === "ADMIN";
+    document.querySelectorAll<HTMLAnchorElement>("a[data-account]").forEach((a) => {
+      a.href = admin ? "/admin/" : "/client/";
+      a.textContent = (admin ? a.dataset.labelAdmin : a.dataset.labelClient) ?? a.textContent;
+    });
+  });
+</script>

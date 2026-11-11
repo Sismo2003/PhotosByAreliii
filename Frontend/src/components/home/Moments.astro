@@ -1,0 +1,143 @@
+---
+// "Moments" (Main.dc.html): a strip of frames where the current one opens wide. It advances with the
+// page scroll and on a timer (paused by "Pause", by any manual pick, and by prefers-reduced-motion).
+// Desktop shows 10 frames, phones the first 6. Works without JS: the first frame stays open.
+import Photo from "../site/Photo.astro";
+import { MOMENTS } from "../../data/photos";
+import { useT, type Lang } from "../../i18n";
+
+const { lang } = Astro.props as { lang: Lang };
+const { t } = useT(lang);
+const ctrl = "eyebrow min-h-11 min-w-11 cursor-pointer border-0 bg-transparent px-1 text-ink";
+---
+
+<section id="moments" data-moments data-label-play={t("home.play")} data-label-pause={t("home.pause")} class="page-x container-site pt-[72px] lg:pt-[120px]">
+  <div class="mb-5 flex items-end justify-between lg:mb-8">
+    <div>
+      <h2 class="eyebrow m-0">{t("home.momentsTitle")}</h2>
+      <p class="mt-1.5 mb-0 text-[19px] leading-7 lg:mt-2 lg:text-[21px] lg:leading-8" set:html={t("home.momentsLead")} />
+    </div>
+    <span data-counter class="eyebrow hidden text-muted lg:inline">01 / {String(MOMENTS.length).padStart(2, "0")}</span>
+  </div>
+
+  <div class="flex h-[460px] gap-1.5 lg:h-[640px] lg:gap-3">
+    {
+      MOMENTS.map((m, i) => (
+        <button
+          type="button"
+          data-frame
+          data-caption={m.caption[lang]}
+          aria-label={t("home.showPhoto", { n: i + 1, alt: m.photo.alt[lang] })}
+          aria-pressed={i === 0 ? "true" : "false"}
+          class:list={[
+            "relative h-full min-w-0 cursor-pointer overflow-hidden border-0 bg-soft p-0 transition-[flex-grow] duration-[900ms] ease-reveal",
+            i >= 6 && "max-lg:hidden",
+          ]}
+          style={`flex: ${i === 0 ? "var(--open, 8)" : 1} 1 0px`}
+        >
+          <Photo
+            photo={m.photo}
+            lang={lang}
+            sizes="(min-width: 1024px) 760px, 240px"
+            widths={[240, 480, 760, 1140, 1520]}
+            class="absolute top-0 left-1/2 h-full w-[240px] max-w-none -translate-x-1/2 lg:w-[760px]"
+          />
+        </button>
+      ))
+    }
+  </div>
+
+  <div class="mt-4 flex items-center gap-3 lg:gap-6">
+    <button type="button" data-toggle class={ctrl}>{t("home.pause")}</button>
+    <span class="relative block h-px grow bg-line"><span data-bar class="block h-full bg-ink transition-[width] duration-[900ms] ease-reveal" style={`width: ${(100 / MOMENTS.length).toFixed(1)}%`}></span></span>
+    <button type="button" data-prev aria-label={t("home.prev")} class={ctrl}>←</button>
+    <button type="button" data-next aria-label={t("home.next")} class={ctrl}>→</button>
+  </div>
+  <p data-caption-out aria-live="polite" class="mt-1 mb-0 text-[15px] text-muted italic lg:text-base">{MOMENTS[0].caption[lang]}</p>
+</section>
+
+<style>
+  [data-moments] {
+    --open: 8;
+  }
+  @media (min-width: 1024px) {
+    [data-moments] {
+      --open: 18;
+    }
+  }
+</style>
+
+<script>
+  const AUTOPLAY_MS = 3200;
+  const IDLE_AFTER_SCROLL_MS = 4000;
+
+  for (const root of document.querySelectorAll<HTMLElement>("[data-moments]")) {
+    const all = [...root.querySelectorAll<HTMLButtonElement>("[data-frame]")];
+    const counter = root.querySelector<HTMLElement>("[data-counter]");
+    const bar = root.querySelector<HTMLElement>("[data-bar]")!;
+    const caption = root.querySelector<HTMLElement>("[data-caption-out]")!;
+    const toggle = root.querySelector<HTMLButtonElement>("[data-toggle]")!;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const visible = () => all.filter((f) => f.offsetParent !== null);
+
+    let i = 0;
+    let playing = !reduced.matches;
+    let lastManual = 0;
+
+    const pad = (n: number) => String(n).padStart(2, "0");
+    const render = () => {
+      const frames = visible();
+      const n = frames.length;
+      i = ((i % n) + n) % n;
+      frames.forEach((f, k) => {
+        f.style.flexGrow = k === i ? "var(--open)" : "1";
+        f.setAttribute("aria-pressed", String(k === i));
+      });
+      bar.style.width = `${(((i + 1) / n) * 100).toFixed(1)}%`;
+      caption.textContent = `${frames[i].dataset.caption ?? ""}${counter ? "" : ` · ${pad(i + 1)} / ${pad(n)}`}`;
+      if (counter) counter.textContent = `${pad(i + 1)} / ${pad(n)}`;
+      toggle.textContent = playing ? root.dataset.labelPause! : root.dataset.labelPlay!;
+    };
+    const go = (k: number) => {
+      i = k;
+      render();
+    };
+
+    all.forEach((f) =>
+      f.addEventListener("click", () => {
+        lastManual = Date.now();
+        go(visible().indexOf(f));
+      }),
+    );
+    root.querySelector("[data-prev]")!.addEventListener("click", () => ((lastManual = Date.now()), go(i - 1)));
+    root.querySelector("[data-next]")!.addEventListener("click", () => ((lastManual = Date.now()), go(i + 1)));
+    toggle.addEventListener("click", () => {
+      playing = !playing;
+      render();
+    });
+
+    // Scroll through the section → flip through the frames.
+    const onScroll = () => {
+      const r = root.getBoundingClientRect();
+      const vh = window.innerHeight || 800;
+      if (r.bottom < 0 || r.top > vh) return;
+      const p = Math.min(0.999, Math.max(0, (vh - r.top) / (vh + r.height)));
+      const k = Math.floor(p * visible().length);
+      lastManual = Date.now();
+      if (k !== i) go(k);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", render, { passive: true });
+
+    // Autoplay only while the section is on screen.
+    let onScreen = false;
+    new IntersectionObserver(([e]) => (onScreen = e.isIntersecting)).observe(root);
+    setInterval(() => {
+      if (!playing || !onScreen || document.hidden) return;
+      if (Date.now() - lastManual < IDLE_AFTER_SCROLL_MS) return;
+      go(i + 1);
+    }, AUTOPLAY_MS);
+
+    render();
+  }
+</script>

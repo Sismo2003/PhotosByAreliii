@@ -1,0 +1,706 @@
+{
+  "meta": {
+    "homeTitle": "Fotógrafa de retratos en {region}",
+    "homeDescription": "Fotógrafa de retratos en {region}: sesiones de graduación, individuales, familia y parejas, maternidad, cumpleaños y branding desde {from}. Todas las fotos editadas, en una galería privada.",
+    "servicesTitle": "Sesiones de fotos y precios",
+    "servicesDescription": "Sesiones de fotos en {region} y sus precios desde: graduación {graduation}, individuales {solos}, familia y parejas {familyCouples}, maternidad {maternity}, cumpleaños {birthdays}, branding {branding}.",
+    "serviceTitle": "Fotografía de {name} en {region}",
+    "bookTitle": "Reservar una sesión",
+    "bookDescription": "Pide una sesión de fotos con {owner} en {region}. Elige la sesión, manda la fecha que prefieres y {owner} la confirma personalmente.",
+    "policiesTitle": "Políticas de reserva",
+    "policiesDescription": "Depósito, cancelaciones, cambios de fecha, retrasos y menores de edad: las políticas de reserva de {brand}.",
+    "privacyTitle": "Aviso de privacidad",
+    "privacyDescription": "Cómo {brand} recopila, usa y protege tu información en este sitio, en las reservas y en las galerías privadas.",
+    "termsTitle": "Términos de uso",
+    "termsDescription": "Términos para usar el sitio de {brand}, las galerías de clientes y las fotografías.",
+    "notFoundTitle": "Página no encontrada",
+    "notFoundDescription": "Esta página no existe."
+  },
+  "nav": {
+    "skip": "Ir al contenido",
+    "home": "Inicio",
+    "portfolio": "Portafolio",
+    "services": "Servicios",
+    "book": "Reservar",
+    "clientLogin": "Acceso clientes",
+    "myGalleries": "Mis galerías",
+    "admin": "Admin",
+    "menu": "Menú",
+    "close": "Cerrar",
+    "language": "Idioma",
+    "primary": "Principal",
+    "breadcrumb": "Ruta"
+  },
+  "common": {
+    "from": "desde",
+    "fromCap": "Desde",
+    "bookSession": "Reservar sesión",
+    "bookThis": "Reservar esta sesión",
+    "bookPackage": "Reservar {name}",
+    "seeServices": "Ver servicios",
+    "allServices": "Todos los servicios",
+    "viewDetails": "Ver detalles",
+    "book": "Reservar",
+    "fullPortfolio": "Portafolio completo",
+    "viewFullPortfolio": "Ver el portafolio completo",
+    "seePricing": "Ver precios",
+    "includes": "Incluye",
+    "pricing": "Precios",
+    "goodToKnow": "Bueno saber",
+    "otherSessions": "Otras sesiones",
+    "whatsIncluded": "Qué incluye",
+    "whatsIncludedSub": "Todo lo que necesitas para la sesión, sin sorpresas.",
+    "recentSessions": "Sesiones recientes de {name}",
+    "beforeSession": "Antes de tu sesión",
+    "readFullPolicies": "Leer las políticas completas",
+    "emailMe": "Escríbeme"
+  },
+  "goodToKnow": [
+    "Son precios desde: un lugar que cobra entrada o servicios adicionales pueden cambiar el total.",
+    "Cambio de ropa extra: +{outfit} cada uno.",
+    "La mayoría de las sesiones duran de 1 a 2 horas, y recibes todas las fotos editadas.",
+    "Un depósito no reembolsable del {deposit}% aparta tu fecha."
+  ],
+  "home": {
+    "eyebrow": "Fotógrafa de retratos · {region}",
+    "lead": "Graduaciones, cumpleaños, maternidad, familia, retratos individuales y branding. Fotos que se sienten como <em>tú</em>, tomadas con <em>cariño</em> y entregadas en tu propia <em>galería privada</em>.",
+    "momentsTitle": "Momentos",
+    "momentsLead": "Algunas de mis fotos favoritas: <em>desliza</em> para verlas.",
+    "play": "Reproducir",
+    "pause": "Pausa",
+    "prev": "Foto anterior",
+    "next": "Foto siguiente",
+    "showPhoto": "Ver foto {n}: {alt}",
+    "portfolioTitle": "Portafolio",
+    "portfolioLead": "Sesiones recientes, <em>casi siempre en la hora dorada</em>.",
+    "filterAll": "Todo",
+    "filters": "Filtrar el portafolio",
+    "servicesTitle": "Servicios"
+  },
+  "categories": {
+    "graduation": "Graduación",
+    "solos": "Individual",
+    "family": "Familia",
+    "couples": "Parejas",
+    "maternity": "Maternidad",
+    "birthday": "Cumpleaños",
+    "party": "Fiesta",
+    "branding": "Branding"
+  },
+  "servicesPage": {
+    "h1": "Sesiones para los días que vale la pena guardar.",
+    "lead": "Precios desde. La mayoría de las sesiones duran de 1 a 2 horas, e incluyen guía de poses y todas las fotos editadas.",
+    "policiesTitle": "Políticas",
+    "policiesLead": "Todos somos humanos y a veces pasan cosas: lo entiendo.",
+    "customTitle": "¿No ves la sesión que buscas?",
+    "customLead": "Escríbeme: cuéntame qué tienes en mente y la planeamos juntas."
+  },
+  "services": {
+    "graduation": {
+      "name": "Graduación",
+      "tagline": "Birrete, toga, estola y el campus que te trajo hasta aquí.",
+      "short": "1–2 horas · en tu campus o un lugar que te guste · todas las fotos editadas",
+      "intro": "Para la prepa, la universidad y cada logro de primera generación. Fotografiamos en tu campus, con tus colores y con tu gente si quieres que esté.",
+      "fact": "Las sesiones de graduación con {brand} cuestan desde {price} y duran de 1 a 2 horas en tu campus o un lugar que te guste, con todas las fotos editadas.",
+      "included": [
+        "1–2 horas en tu campus o un lugar que te guste",
+        "Fotos con birrete, toga, estola, cordones y diploma",
+        "Tu familia y amigos son bienvenidos",
+        "Todas las fotos entregadas editadas",
+        "Cambios de ropa extra +{outfit} cada uno",
+        "Galería privada en línea"
+      ],
+      "extraGoodToKnow": [],
+      "before": [
+        {
+          "title": "Reserva con tiempo",
+          "text": "La temporada de graduaciones se llena rápido: reserva con tiempo para recibir tus fotos antes de que las necesites."
+        },
+        {
+          "title": "Trae todo",
+          "text": "Birrete, toga, estola, cordones y cualquier cosa con los colores de tu escuela."
+        },
+        {
+          "title": "Hora dorada",
+          "text": "Empezamos como una hora antes del atardecer para tener luz cálida y suave."
+        }
+      ],
+      "ready": "¿Lista para tus fotos de <em>graduación</em>?",
+      "packages": {
+        "graduation": {
+          "name": "Sesión de graduación",
+          "note": "1–2 horas · todas las fotos editadas · cambios de ropa extra +{outfit}"
+        }
+      }
+    },
+    "solos": {
+      "name": "Individual",
+      "tagline": "Solo tú, con tu mejor luz.",
+      "short": "1–2 horas · estudio o exteriores · todas las fotos editadas",
+      "intro": "Solo tú. Cumpleaños, logros, un nuevo look o simplemente porque sí: retratos que se sienten como tú, en estudio o en exteriores.",
+      "fact": "Las sesiones individuales con {brand} cuestan desde {price} y duran de 1 a 2 horas en estudio o en exteriores, con guía de poses y todas las fotos editadas.",
+      "included": [
+        "1–2 horas, en estudio o en exteriores",
+        "Guía de poses toda la sesión",
+        "Para cumpleaños, logros o porque sí",
+        "Todas las fotos entregadas editadas",
+        "Cambios de ropa extra +{outfit} cada uno",
+        "Galería privada en línea"
+      ],
+      "extraGoodToKnow": [],
+      "before": [
+        {
+          "title": "Planea tus outfits",
+          "text": "Trae un par de looks; cada cambio extra es +{outfit}."
+        },
+        {
+          "title": "Mándame inspiración",
+          "text": "Capturas o tableros de Pinterest me ayudan a planear tus poses."
+        },
+        {
+          "title": "Hora dorada",
+          "text": "Empezamos como una hora antes del atardecer para tener luz cálida y suave."
+        }
+      ],
+      "ready": "¿Lista para tus fotos <em>individuales</em>?",
+      "packages": {
+        "solo": {
+          "name": "Sesión individual",
+          "note": "1–2 horas · todas las fotos editadas · cambios de ropa extra +{outfit}"
+        }
+      }
+    },
+    "family-couples": {
+      "name": "Familia y parejas",
+      "tagline": "Todos en una foto, los abuelos también.",
+      "short": "1–2 horas · parejas, familias y niños · todas las fotos editadas",
+      "intro": "Retratos familiares, compromisos y aniversarios: relajados, con un poco de guía y llenos de las personas que más importan.",
+      "fact": "Las sesiones de pareja con {brand} cuestan desde {couples} y las familiares desde {family}; ambas duran de 1 a 2 horas en un lugar, con todas las fotos editadas.",
+      "included": [
+        "1–2 horas en un mismo lugar",
+        "Parejas, familias, niños y abuelos",
+        "Fotos de grupo, de pareja e individuales",
+        "Todas las fotos entregadas editadas",
+        "Cambios de ropa extra +{outfit} cada uno",
+        "Galería privada en línea"
+      ],
+      "extraGoodToKnow": [],
+      "before": [
+        {
+          "title": "Coordinen, no combinen igual",
+          "text": "Elijan 2 o 3 colores y que cada quien escoja dentro de ellos."
+        },
+        {
+          "title": "Trae snacks",
+          "text": "Los pequeños aguantan más con un premio en el carro."
+        },
+        {
+          "title": "Lugares al atardecer",
+          "text": "Lost Dutchman y el brillo del desierto al final del día."
+        }
+      ],
+      "ready": "¿Listos para sus fotos en <em>familia</em>?",
+      "packages": {
+        "couples": {
+          "name": "Pareja",
+          "note": "Ustedes dos · 1–2 horas · todas las fotos editadas"
+        },
+        "family": {
+          "name": "Familia",
+          "note": "Toda la familia · 1–2 horas · todas las fotos editadas"
+        }
+      }
+    },
+    "maternity": {
+      "name": "Maternidad",
+      "tagline": "Antes de que llegue el bebé.",
+      "short": "1–2 horas · desierto o estudio · todas las fotos editadas",
+      "intro": "Retratos suaves y sin prisa entre las semanas 28 y 36: solo tú, o con tu pareja y tus hijos. En el desierto a la hora dorada o en estudio.",
+      "fact": "Las sesiones de maternidad con {brand} cuestan desde {price}, duran de 1 a 2 horas en el desierto o en estudio, y conviene reservarlas para las semanas 28 a 36.",
+      "included": [
+        "1–2 horas, en el desierto o en estudio",
+        "Tu pareja y tus hijos son bienvenidos",
+        "Fotos de la pancita, del ultrasonido y de detalles",
+        "Todas las fotos entregadas editadas",
+        "Cambios de ropa extra +{outfit} cada uno",
+        "Galería privada en línea"
+      ],
+      "extraGoodToKnow": [],
+      "before": [
+        {
+          "title": "El mejor momento",
+          "text": "Reserva para las semanas 28 a 36, cuando todavía te sientes cómoda."
+        },
+        {
+          "title": "Algo con vuelo",
+          "text": "Los vestidos largos se mueven precioso con el viento del desierto."
+        },
+        {
+          "title": "Descansa",
+          "text": "Vamos a tu ritmo; hay sombra y agua."
+        }
+      ],
+      "ready": "¿Lista para tus fotos de <em>maternidad</em>?",
+      "packages": {
+        "maternity": {
+          "name": "Sesión de maternidad",
+          "note": "1–2 horas · todas las fotos editadas · cambios de ropa extra +{outfit}"
+        }
+      }
+    },
+    "birthdays-parties": {
+      "name": "Cumpleaños y fiestas",
+      "tagline": "Los globos, el pastel y todos los que vinieron a celebrar.",
+      "short": "1–2 horas · estudio o exteriores · todas las fotos editadas",
+      "intro": "Cumpleaños de todas las edades —el primero, los dieciséis, los 21, los 60— y las fiestas que los rodean. En estudio con globos y fondos, en exteriores a la hora dorada, o en tu celebración con tus invitados.",
+      "fact": "Las sesiones de cumpleaños con {brand} cuestan desde {birthday}; las de fiesta desde {party} por 90 minutos con tus invitados, y cada 30 minutos extra son +{extra30}.",
+      "included": [
+        "Estudio o exteriores, 1–2 horas",
+        "Globos, fondo y decoración en estudio",
+        "Retratos, pastel y fotos de detalles",
+        "Sesiones de fiesta: fotos con tus invitados y anfitriones",
+        "Todas las fotos entregadas editadas",
+        "Galería privada en línea"
+      ],
+      "extraGoodToKnow": [
+        "El precio de la fiesta puede cambiar según el tamaño de la fiesta."
+      ],
+      "before": [
+        {
+          "title": "Planea el look",
+          "text": "Mándame tus colores y tu tema para preparar el set antes de que llegues."
+        },
+        {
+          "title": "Trae los detalles",
+          "text": "Números, coronas, pastel, flores: todo lo que cuente tu historia."
+        },
+        {
+          "title": "Horario de la fiesta",
+          "text": "Mándame el programa para no perderme el pastel, las velitas ni a tu gente favorita."
+        }
+      ],
+      "ready": "¿Lista para tus fotos de <em>cumpleaños</em>?",
+      "packages": {
+        "birthday": {
+          "name": "Cumpleaños",
+          "note": "Sesión de retrato · estudio o exteriores · todas las fotos editadas"
+        },
+        "party": {
+          "name": "Fiesta",
+          "note": "90 min en tu fiesta · fotos con invitados y anfitriones · +{extra30} cada 30 min extra"
+        }
+      }
+    },
+    "branding": {
+      "name": "Branding",
+      "tagline": "Fotos que hacen que tu negocio se vea como tú.",
+      "short": "1–2 horas · estudio o tu espacio · todas las fotos editadas",
+      "intro": "Fotos para tu negocio: retratos profesionales, productos y los detalles que hacen tuya tu marca. Listas para tu sitio web y tus redes sociales.",
+      "fact": "Las sesiones de branding con {brand} cuestan desde {price} e incluyen retratos, productos y detalles en 1 a 2 horas, listos para tu sitio web y tus redes.",
+      "included": [
+        "1–2 horas, en estudio o en tu espacio",
+        "Retratos profesionales para tu negocio",
+        "Fotos de productos y detalles",
+        "Fotos listas para tu sitio web y redes sociales",
+        "Todas las fotos entregadas editadas",
+        "Cambios de ropa extra +{outfit} cada uno"
+      ],
+      "extraGoodToKnow": [],
+      "before": [
+        {
+          "title": "Conoce tu marca",
+          "text": "Mándame tus colores y dónde se van a usar las fotos."
+        },
+        {
+          "title": "Trae tus productos",
+          "text": "Lo que vendes o usas todos los días cuenta tu historia."
+        },
+        {
+          "title": "Planea tus looks",
+          "text": "Dos o tres outfits te dan variedad para meses de publicaciones."
+        }
+      ],
+      "ready": "¿Lista para tus fotos de <em>branding</em>?",
+      "packages": {
+        "branding": {
+          "name": "Sesión de branding",
+          "note": "Retratos y productos · 1–2 horas · todas las fotos editadas"
+        }
+      }
+    }
+  },
+  "extras": {
+    "outfit": "Cambio de ropa extra",
+    "extra30": "30 minutos extra · sesiones de fiesta"
+  },
+  "policies": {
+    "h1": "Políticas de reserva",
+    "lead": "Todos somos humanos y a veces pasan cosas: lo entiendo. Así funcionan las reservas.",
+    "updated": "Última actualización: {date}",
+    "items": [
+      {
+        "id": "deposit",
+        "title": "Depósito",
+        "q": "¿Necesito un depósito para reservar?",
+        "text": "Se requiere un depósito del {deposit}% para apartar tu sesión: sin depósito, la sesión no queda apartada. El depósito no es reembolsable."
+      },
+      {
+        "id": "cancelling",
+        "title": "Cancelaciones",
+        "q": "¿Con cuánta anticipación debo cancelar?",
+        "text": "Avísame por lo menos {hours} horas antes de tu sesión."
+      },
+      {
+        "id": "rescheduling",
+        "title": "Cambio de fecha",
+        "q": "¿Puedo cambiar la fecha de mi sesión?",
+        "text": "Tu depósito del {deposit}% se aplica a la nueva fecha, una sola vez. Si la sesión reprogramada se cancela, tendrás que reservar una sesión nueva."
+      },
+      {
+        "id": "late",
+        "title": "Si llegas tarde",
+        "q": "¿Qué pasa si llego tarde?",
+        "text": "Hay {minutes} minutos de tolerancia. Después cuenta como inasistencia y el depósito no se puede aplicar a otra sesión. Escríbeme lo antes posible."
+      },
+      {
+        "id": "delivery",
+        "title": "Entrega de fotos",
+        "q": "¿Con cuánto tiempo debo reservar para recibir mis fotos a tiempo?",
+        "text": "Reserva con tiempo suficiente para recibir tus fotos para la fecha en que las necesitas. Todas las fotos se entregan editadas, en una galería privada en línea."
+      },
+      {
+        "id": "minors",
+        "title": "Menores de edad",
+        "q": "¿Pueden reservar menores de edad?",
+        "text": "Las sesiones de menores de {age} años necesitan el consentimiento de su madre, padre o tutor."
+      },
+      {
+        "id": "payments",
+        "title": "Pagos",
+        "q": "¿Cómo pago?",
+        "text": "Los pagos se hacen directamente a {owner} (por ejemplo Zelle, Cash App o efectivo) y se registran a mano. Este sitio nunca pide datos de tarjeta."
+      },
+      {
+        "id": "sharing",
+        "title": "Publicación de tus fotos",
+        "q": "¿Se publicarán mis fotos en internet?",
+        "text": "Solo con tu permiso. Al reservar puedes decir si tus fotos pueden compartirse en las redes y el sitio de {brand}, y qué no quieres que se publique (por ejemplo, las caras de los niños)."
+      }
+    ]
+  },
+  "privacy": {
+    "h1": "Aviso de privacidad",
+    "updated": "Última actualización: {date}",
+    "intro": "Este aviso explica qué información recopila {legal} (“nosotros”) a través de este sitio, el portal de clientes y las reservas, y cómo se usa. Lo mantenemos breve y no vendemos tus datos.",
+    "sections": [
+      {
+        "title": "Qué recopilamos",
+        "items": [
+          "Los datos de contacto que nos envías: nombre, correo, teléfono y los detalles de la sesión que quieres.",
+          "Datos de la reserva: tipo de sesión, fecha, lugar, notas y si tus fotos se pueden compartir.",
+          "Cuentas de cliente: tu correo o teléfono de acceso y una contraseña guardada de forma segura (con hash).",
+          "Tus fotos, guardadas de forma privada en nuestro propio servidor mientras tu galería esté abierta."
+        ]
+      },
+      {
+        "title": "Para qué la usamos",
+        "items": [
+          "Para responderte, confirmar y realizar tu sesión, y entregarte tu galería.",
+          "Para enviarte correos sobre tu reserva y tu galería (por ejemplo, un aviso antes de que tu galería cierre).",
+          "Nunca vendemos ni rentamos tu información y no usamos rastreadores de publicidad."
+        ]
+      },
+      {
+        "title": "Cookies",
+        "items": [
+          "Al iniciar sesión se guarda una sola cookie de sesión, segura y http-only, que te mantiene dentro. No se usa para rastrearte.",
+          "Tu idioma se recuerda en tu navegador para que el sitio abra en el idioma que elegiste."
+        ]
+      },
+      {
+        "title": "Tus fotos y galerías",
+        "items": [
+          "Las galerías son privadas: solo tú (con tu acceso o la contraseña de la galería) y {owner} pueden verlas.",
+          "Las fotos se borran cuando vence tu galería; te avisamos por correo antes para que puedas descargarlas.",
+          "Solo publicamos tus fotos si diste permiso al reservar."
+        ]
+      },
+      {
+        "title": "Tus derechos",
+        "items": [
+          "Puedes pedir una copia de tu información, corregirla o pedir que la borremos escribiendo a {email}.",
+          "Algunos registros (como los pagos) pueden conservarse el tiempo que exija la ley."
+        ]
+      },
+      {
+        "title": "Menores de edad",
+        "items": [
+          "Las sesiones de menores de {age} años necesitan el consentimiento de su madre, padre o tutor, y la reserva la hace la persona adulta."
+        ]
+      },
+      {
+        "title": "Contacto",
+        "items": [
+          "Dudas sobre este aviso: {email}."
+        ]
+      }
+    ]
+  },
+  "terms": {
+    "h1": "Términos de uso",
+    "updated": "Última actualización: {date}",
+    "intro": "Al usar este sitio o una galería de cliente aceptas estos términos.",
+    "sections": [
+      {
+        "title": "Reservas",
+        "items": [
+          "Enviar una solicitud no aparta la fecha: {owner} confirma cada reserva personalmente, y la sesión queda apartada al recibir el depósito.",
+          "Los precios de este sitio son precios desde; un lugar con costo de entrada o servicios adicionales pueden cambiar el total.",
+          "Las políticas de reserva forman parte de estos términos."
+        ]
+      },
+      {
+        "title": "Fotografías y derechos de autor",
+        "items": [
+          "Todas las fotografías de este sitio y de las galerías son © {legal}. Los derechos de autor son de {legal}.",
+          "Los clientes reciben una licencia de uso personal de su galería: imprimirlas, compartirlas con familia y amigos y publicarlas en sus redes dando crédito (@{instagram}).",
+          "El uso comercial, editar o poner filtros a las fotos entregadas, o venderlas, requiere permiso por escrito. Las sesiones de branding incluyen el uso para tu propio negocio."
+        ]
+      },
+      {
+        "title": "Cuentas y galerías",
+        "items": [
+          "Mantén privados tu acceso y la contraseña de tu galería. Las galerías están disponibles por tiempo limitado; descarga tus fotos antes de que venzan."
+        ]
+      },
+      {
+        "title": "El sitio",
+        "items": [
+          "El contenido de este sitio no puede copiarse ni reutilizarse sin permiso. Podemos actualizar estos términos; la fecha de arriba indica la versión más reciente."
+        ]
+      },
+      {
+        "title": "Contacto",
+        "items": [
+          "{email}"
+        ]
+      }
+    ]
+  },
+  "book": {
+    "h1": "Reservar una sesión",
+    "stepOf": "Paso {n} de 5",
+    "steps": {
+      "session": "Sesión",
+      "date": "Fecha y hora",
+      "location": "Lugar",
+      "details": "Tus datos",
+      "review": "Revisar y enviar"
+    },
+    "nav": {
+      "back": "Atrás",
+      "continue": "Continuar"
+    },
+    "s1": {
+      "h1": "¿Qué vamos a <em>celebrar?</em>",
+      "lead": "Elige una sesión. Abajo puedes agregar extras.",
+      "package": "Paquete",
+      "extras": "Extras",
+      "optional": "opcional",
+      "less": "Uno menos: {name}",
+      "more": "Uno más: {name}"
+    },
+    "s2": {
+      "h1": "Elige una <em>fecha.</em>",
+      "lead": "Los días disponibles tienen borde. Las tardes se llenan rápido en primavera y otoño.",
+      "prev": "Mes anterior",
+      "next": "Mes siguiente",
+      "pickDay": "Elige un día con borde para ver sus horarios.",
+      "sunset": "El atardecer es como a las {time}. Te recomiendo empezar una hora antes para la luz dorada.",
+      "noDays": "No hay fechas libres este mes. Prueba el siguiente o escríbeme.",
+      "taken": "Ocupado",
+      "loading": "Cargando las fechas…",
+      "error": "No pude cargar las fechas.",
+      "retry": "Intentar de nuevo"
+    },
+    "s3": {
+      "h1": "¿Dónde hacemos las <em>fotos?</em>",
+      "lead": "Elige uno de mis lugares favoritos, el estudio o dime el tuyo.",
+      "park": {
+        "name": "Lost Dutchman State Park",
+        "text": "Desierto y las montañas Superstition.",
+        "tag": "Algunos parques cobran la entrada"
+      },
+      "campus": {
+        "name": "Campus",
+        "text": "Tu escuela — ASU, GCU, NAU o tu preparatoria.",
+        "tag": "Ideal para graduaciones"
+      },
+      "studio": {
+        "name": "Estudio",
+        "text": "Fondos, globos y luz de interior.",
+        "tag": "Con cualquier clima"
+      },
+      "other": "En otro lugar",
+      "campusField": "¿Qué campus?",
+      "campusHint": "p. ej. ASU Tempe",
+      "otherField": "Lugar o dirección",
+      "otherHint": "p. ej. el rancho de mis abuelos en Queen Creek",
+      "fee": "Si el lugar cobra una cuota, se suma a tu total — te aviso antes de confirmar."
+    },
+    "s4": {
+      "h1": "Un poco sobre <em>ti.</em>",
+      "lead": "Este correo será tu usuario para la galería privada.",
+      "firstName": "Nombre",
+      "lastName": "Apellido",
+      "email": "Correo",
+      "phone": "Teléfono",
+      "people": "¿Cuántas personas?",
+      "peopleOptions": {
+        "JUST_ME": "Solo yo",
+        "TWO": "2",
+        "THREE_TO_FIVE": "3–5",
+        "SIX_TO_EIGHT": "6–8"
+      },
+      "heard": "¿Cómo me encontraste?",
+      "heardOptions": {
+        "INSTAGRAM": "Instagram",
+        "FRIEND": "Por un amigo o amiga",
+        "GOOGLE": "Google",
+        "TIKTOK": "TikTok",
+        "RETURNING_CLIENT": "Ya reservé antes",
+        "OTHER": "Otro"
+      },
+      "choose": "Elige una opción",
+      "school": "Escuela y colores",
+      "schoolHint": "p. ej. ASU · granate y dorado",
+      "when": "¿Para cuándo necesitas tus fotos?",
+      "inspo": "Inspiración · enlaces o ideas",
+      "inspoHint": "Pinterest, Instagram o unas palabras",
+      "share": "¿Puedo compartir tus fotos?",
+      "shareOptions": {
+        "YES": "Sí, puedes publicarlas",
+        "PARTIAL": "Sí, pero no todas",
+        "NO": "No, que sean privadas"
+      },
+      "noShare": "¿Algo que no quieras que publique?",
+      "noShareHint": "p. ej. las caras de los niños",
+      "notes": "¿Algo que deba saber?",
+      "notesHint": "Ideas, poses que te encantan, accesorios que vas a llevar…",
+      "minor": "La sesión es para alguien menor de {age} años y soy su madre, padre o tutor. Doy mi consentimiento.",
+      "optional": "opcional",
+      "website": "Deja este campo vacío"
+    },
+    "s5": {
+      "h1": "Revisa y <em>envía.</em>",
+      "lead": "Revisa todo y envía tu solicitud. Hoy no se cobra nada.",
+      "edit": "Editar",
+      "client": "Cliente",
+      "how": "Qué sigue",
+      "howItems": [
+        {
+          "title": "Reviso tu solicitud",
+          "text": "En menos de {hours} horas confirmo tu fecha — o te propongo otro horario si ya está ocupado."
+        },
+        {
+          "title": "Envías el depósito",
+          "text": "Envía tu depósito del {deposit}% y una captura del pago — sin depósito, la sesión no queda apartada."
+        },
+        {
+          "title": "Tu fecha queda apartada",
+          "text": "En cuanto llega el depósito, la fecha es tuya. El resto se paga el día de la sesión."
+        }
+      ],
+      "policy": "Políticas de reserva",
+      "accept": "Leí y acepto las políticas de reserva.",
+      "noPayment": "Hoy no pagas nada",
+      "send": "Enviar solicitud",
+      "sending": "Enviando…"
+    },
+    "done": {
+      "eyebrow": "Solicitud enviada",
+      "requestNo": "Solicitud n.º {code}",
+      "h1": "Solicitud enviada, {name}",
+      "when": "{date} a las {time} · {place}.",
+      "reply": "La reviso y te respondo en menos de {hours} horas. Todavía no se cobra nada.",
+      "steps": [
+        {
+          "title": "Confirmo tu fecha",
+          "text": "Te llegará un correo a {email} — o una propuesta de otro horario si ese ya está ocupado."
+        },
+        {
+          "title": "Envía el depósito",
+          "text": "El correo explica cómo enviar el depósito del {deposit}% ({amount}). Sin depósito, la sesión no queda apartada — y el depósito no es reembolsable."
+        },
+        {
+          "title": "Tu sesión queda reservada",
+          "text": "Cuando llega el depósito tu fecha queda apartada y te mando una guía corta: qué ponerte, qué llevar y dónde nos vemos."
+        },
+        {
+          "title": "Tu galería",
+          "text": "Tus fotos editadas llegan a tu galería privada — para la fecha que las necesitas, si reservas con tiempo."
+        }
+      ],
+      "back": "Volver al sitio",
+      "services": "Ver servicios"
+    },
+    "summary": {
+      "title": "Tu reserva",
+      "session": "Sesión",
+      "extras": "Extras",
+      "date": "Fecha",
+      "location": "Lugar",
+      "total": "Total",
+      "deposit": "Depósito del {deposit}% cuando confirme",
+      "balance": "Resto el día de la sesión",
+      "notYet": "Sin elegir",
+      "questions": "¿Dudas antes? Escribe a {email} — respondo en menos de un día."
+    },
+    "errors": {
+      "fix": "Revisa los campos marcados.",
+      "session": "Elige una sesión.",
+      "package": "Elige un paquete.",
+      "date": "Elige un día y un horario.",
+      "place": "Dime el lugar.",
+      "firstName": "Escribe tu nombre.",
+      "lastName": "Escribe tu apellido.",
+      "email": "Escribe un correo válido, como tu@correo.com.",
+      "phone": "Escribe un teléfono completo, como (480) 555-0123.",
+      "photosBy": "Elige una fecha de hoy en adelante.",
+      "tooLong": "Es demasiado largo.",
+      "policy": "Acepta las políticas de reserva.",
+      "taken": "Ese horario se acaba de ocupar. Elige otro, por favor.",
+      "notOffered": "Ese horario ya no está disponible. Elige otro, por favor.",
+      "catalogChanged": "Las sesiones cambiaron mientras reservabas. Revisa tu elección.",
+      "rateLimited": "Demasiadas solicitudes desde esta conexión. Inténtalo más tarde o escríbeme directamente.",
+      "generic": "Algo salió mal al enviar tu solicitud. Inténtalo de nuevo o escríbeme directamente.",
+      "offline": "No pude conectar con el servidor. Revisa tu conexión e inténtalo de nuevo."
+    },
+    "fallback": {
+      "title": "La reserva en línea no está disponible en este momento.",
+      "text": "Igual puedes pedir una fecha por mensaje — respondo en menos de un día.",
+      "retry": "Intentar de nuevo"
+    },
+    "text": "Mensaje de texto",
+    "email": "Correo",
+    "instagram": "DM de Instagram",
+    "message": {
+      "hello": "¡Hola {owner}! Me gustaría reservar una sesión."
+    }
+  },
+  "footer": {
+    "about": "Fotografía de retratos en {region}. Graduaciones, retratos individuales, cumpleaños, maternidad, familia y branding.",
+    "contact": "Contacto",
+    "pages": "Páginas",
+    "services": "Servicios",
+    "privacy": "Privacidad",
+    "terms": "Términos",
+    "policies": "Políticas",
+    "rights": "Todos los derechos reservados."
+  },
+  "notFound": {
+    "h1": "Esta página no existe.",
+    "lead": "Puede que se haya movido. Prueba el inicio o los servicios.",
+    "home": "Ir al inicio"
+  }
+}

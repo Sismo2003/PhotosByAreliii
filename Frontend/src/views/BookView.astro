@@ -1,0 +1,404 @@
+---
+// /book — request a session in 5 steps (Booking.dc.html, BookingDate, BookingLocation, BookingDetails,
+// BookingReview, BookingConfirmed). It creates a Booking with source WEBSITE and status REQUEST through
+// the public API (docs/api-public-booking.md); Areli confirms it by hand from the admin.
+//
+// The markup is static (built here, photos included); book/book.ts loads the catalog and the free
+// times from /api/public and drives the steps. Every "Book" button on the site links with
+// ?service=<slug>&package=<key> (shared/services.js) and the form preselects them — keep them.
+// If the API can't be reached the page offers the old way: text, email or Instagram.
+import Layout from "../layouts/Layout.astro";
+import Photo from "../components/site/Photo.astro";
+import PolicyList from "../components/service/PolicyList.astro";
+import { CONTACT, EXTRAS, SERVICES, SHARED_VARS, SOCIAL } from "../data/site";
+import { SERVICE_PHOTOS, photo } from "../data/photos";
+import { localizePath, useT, type Lang } from "../i18n";
+import { money } from "../utils/money";
+import { smsHref } from "../utils/phone";
+
+const { lang } = Astro.props as { lang: Lang };
+const { t, tl } = useT(lang, SHARED_VARS);
+const email = CONTACT.emails?.primary;
+const instagram = SOCIAL.instagramHandle;
+
+// Placeholders the browser fills (with the API's numbers or the visitor's answers) stay as they are.
+const LIVE = Object.fromEntries(["n", "name", "time", "hours", "deposit", "code", "date", "place", "email", "amount"].map((k) => [k, `{${k}}`]));
+
+const LOCATIONS = [
+  { kind: "PRESET", key: "park", photo: photo("family-superstition-mountains") },
+  { kind: "CAMPUS", key: "campus", photo: photo("graduation-bench-gold-stole") },
+  { kind: "STUDIO", key: "studio", photo: photo("birthday-gold-studio") },
+];
+
+// Everything the script needs, as data (a JSON block doesn't execute → fine under the CSP).
+const data = {
+  lang,
+  s: tl("book", LIVE),
+  services: SERVICES.map((s) => ({
+    slug: s.slug,
+    name: t(`services.${s.slug}.name`),
+    packages: s.packages.map((p) => ({ key: p.key, name: t(`services.${s.slug}.packages.${p.key}.name`), note: t(`services.${s.slug}.packages.${p.key}.note`) })),
+  })),
+  extras: Object.fromEntries(EXTRAS.map((e) => [e.key, t(`extras.${e.key}`)])),
+  locations: { PRESET: t("book.s3.park.name"), CAMPUS: t("book.s3.campus.name"), STUDIO: t("book.s3.studio.name") },
+  // Where "sunset" is computed: the Phoenix area, where most sessions happen.
+  sun: { lat: 33.4484, lng: -112.074 },
+};
+
+const stepKeys = ["session", "date", "location", "details", "review"] as const;
+const h1 = "m-0 mb-2.5 text-[36px] leading-[1.1] font-normal tracking-[-0.01em] focus:outline-none lg:text-[44px]";
+const lead = "mt-0 mb-8 text-[19px] leading-[29px] text-muted";
+const err = "mt-1.5 mb-0 text-sm text-danger";
+const helloSms = CONTACT.phoneE164 ? smsHref(CONTACT.phoneE164, t("book.message.hello")) : undefined;
+const helloMail = email ? `mailto:${email}?subject=${encodeURIComponent(t("book.h1"))}&body=${encodeURIComponent(t("book.message.hello"))}` : undefined;
+const peopleOptions = tl<Record<string, string>>("book.s4.peopleOptions");
+const heardOptions = tl<Record<string, string>>("book.s4.heardOptions");
+const shareOptions = tl<Record<string, string>>("book.s4.shareOptions");
+const howItems = tl<{ title: string; text: string }[]>("book.s5.howItems");
+const doneSteps = tl<{ title: string; text: string }[]>("book.done.steps");
+---
+
+<Layout lang={lang} title={t("meta.bookTitle")} description={t("meta.bookDescription")}>
+  <div class="page-x container-site scroll-mt-4 pt-6 pb-[72px] lg:pt-8 lg:pb-[120px]" data-book>
+    <!-- Progress (Step n of 5 + the five steps on wide screens) -->
+    <nav data-progress hidden aria-label={t("book.h1")} class="border-b border-line pb-4">
+      <p data-step-of class="eyebrow m-0 text-muted lg:hidden">{t("book.stepOf", { n: 1 })}</p>
+      <ol class="m-0 hidden list-none gap-10 p-0 lg:flex">
+        {
+          stepKeys.map((key, i) => (
+            <li data-step-tab={i + 1} class:list={["eyebrow flex gap-2.5 border-b pb-1.5", i === 0 ? "border-ink" : "border-transparent text-muted"]}>
+              <span data-step-num>{String(i + 1).padStart(2, "0")}</span>
+              <span>{t(`book.steps.${key}`)}</span>
+            </li>
+          ))
+        }
+      </ol>
+    </nav>
+
+    <!-- While the catalog loads -->
+    <div data-loading class="mt-10 grid gap-3 lg:mt-12" aria-busy="true">
+      <span class="sr-only">{t("book.s2.loading")}</span>
+      <div class="h-10 w-2/3 max-w-md animate-pulse bg-soft"></div>
+      <div class="mb-6 h-5 w-1/2 max-w-sm animate-pulse bg-soft"></div>
+      {[0, 1, 2, 3].map(() => <div class="h-[92px] max-w-3xl animate-pulse bg-soft" />)}
+    </div>
+
+    <noscript>
+      <p class="mt-10 text-lg">{t("book.fallback.text")} {email && <a class="underline" href={helloMail}>{email}</a>}</p>
+    </noscript>
+
+    <!-- The API can't be reached: book by message instead -->
+    <section data-fallback hidden class="mt-10 max-w-2xl lg:mt-12">
+      <h1 class="mt-0 mb-3 text-[32px] leading-tight font-normal">{t("book.fallback.title")}</h1>
+      <p class={lead}>{t("book.fallback.text")}</p>
+      <div class="flex flex-wrap gap-3">
+        {helloSms && <a href={helloSms} class="btn btn-primary">{t("book.text")}</a>}
+        {helloMail && <a href={helloMail} class="btn btn-outline">{t("book.email")}</a>}
+        {instagram && <a href={`https://ig.me/m/${instagram}`} target="_blank" rel="noopener" class="btn btn-outline">{t("book.instagram")}</a>}
+      </div>
+      <button type="button" data-retry class="link-line mt-8 cursor-pointer">{t("book.fallback.retry")}</button>
+    </section>
+
+    <div data-flow hidden class="mt-8 grid gap-12 lg:mt-12 lg:grid-cols-[minmax(0,1fr)_380px] lg:gap-20">
+      <form data-form novalidate class="min-w-0">
+        <!-- 1 · Session -->
+        <section data-step="1">
+          <h1 tabindex="-1" class={h1} set:html={t("book.s1.h1")} />
+          <p class={lead}>{t("book.s1.lead")}</p>
+          <fieldset class="m-0 flex flex-col gap-3 border-0 p-0">
+            <legend class="sr-only">{t("book.steps.session")}</legend>
+            {
+              SERVICES.map((s) => (
+                <label data-service-card={s.slug} class="grid cursor-pointer grid-cols-[20px_52px_minmax(0,1fr)_auto] items-center gap-4 border border-line px-4 py-3 has-[:checked]:border-ink sm:grid-cols-[20px_64px_minmax(0,1fr)_auto] sm:gap-5 sm:px-5">
+                  <input type="radio" name="service" value={s.slug} class="size-5 accent-ink" />
+                  <Photo photo={SERVICE_PHOTOS[s.slug].thumb} lang={lang} decorative sizes="64px" widths={[64, 128]} class="h-[66px] w-[52px] sm:h-20 sm:w-16" />
+                  <span>
+                    <span class="block text-[20px] leading-tight sm:text-[22px]">{t(`services.${s.slug}.name`)}</span>
+                    <span class="block text-sm leading-[21px] text-muted">{t(`services.${s.slug}.short`)}</span>
+                  </span>
+                  <span class="text-[20px] whitespace-nowrap sm:text-[22px]">
+                    <span class="text-sm text-muted italic">{t("common.from")} </span><span data-from>{money(s.from)}</span>
+                  </span>
+                </label>
+              ))
+            }
+            <div data-more-services class="contents"></div>
+          </fieldset>
+          <p data-error-for="serviceId" hidden class={err}></p>
+
+          <fieldset data-packages hidden class="m-0 mt-9 border-0 p-0">
+            <legend class="eyebrow mb-3">{t("book.s1.package")}</legend>
+            <div data-package-list class="flex flex-col gap-3"></div>
+          </fieldset>
+
+          <div data-extras hidden class="mt-9">
+            <p class="eyebrow mt-0 mb-3">{t("book.s1.extras")} <span class="text-muted">· {t("book.s1.optional")}</span></p>
+            <div data-extra-list class="border-b border-line"></div>
+          </div>
+        </section>
+
+        <!-- 2 · Date & time -->
+        <section data-step="2" hidden>
+          <h1 tabindex="-1" class={h1} set:html={t("book.s2.h1")} />
+          <p class={lead}>{t("book.s2.lead")}</p>
+          <div class="grid items-start gap-8 md:grid-cols-[minmax(0,1fr)_260px] md:gap-10">
+            <div>
+              <div class="mb-4 flex items-center justify-between">
+                <button type="button" data-month-prev class="eyebrow inline-flex h-11 cursor-pointer items-center disabled:cursor-not-allowed disabled:opacity-30" aria-label={t("book.s2.prev")}>← <span data-prev-label class="ml-1"></span></button>
+                <h2 data-month-title class="m-0 text-2xl font-normal" aria-live="polite"></h2>
+                <button type="button" data-month-next class="eyebrow inline-flex h-11 cursor-pointer items-center disabled:cursor-not-allowed disabled:opacity-30" aria-label={t("book.s2.next")}><span data-next-label class="mr-1"></span> →</button>
+              </div>
+              <div data-weekdays class="mb-2 grid grid-cols-7 gap-1.5"></div>
+              <div data-days class="grid grid-cols-7 gap-1.5" aria-busy="true"></div>
+              <p data-cal-status role="status" class="mt-3 mb-0 min-h-6 text-[15px] text-muted"></p>
+            </div>
+            <div data-day-panel class="hidden">
+              <h2 data-day-title class="eyebrow mt-0 mb-1.5"></h2>
+              <p data-sunset class="mt-0 mb-4 text-[15px] leading-[22px] text-muted"></p>
+              <div data-slots class="flex flex-col gap-2"></div>
+            </div>
+          </div>
+          <p data-error-for="date" hidden class={err}></p>
+          <p data-error-for="time" hidden class={err}></p>
+        </section>
+
+        <!-- 3 · Location -->
+        <section data-step="3" hidden>
+          <h1 tabindex="-1" class={h1} set:html={t("book.s3.h1")} />
+          <p class={lead}>{t("book.s3.lead")}</p>
+          <fieldset class="m-0 border-0 p-0">
+            <legend class="sr-only">{t("book.steps.location")}</legend>
+            <div class="grid gap-3 sm:grid-cols-3">
+              {
+                LOCATIONS.map((l) => (
+                  <label class="flex cursor-pointer flex-col gap-3 border border-line p-3.5 has-[:checked]:border-ink">
+                    <Photo photo={l.photo} lang={lang} decorative sizes="(min-width: 1024px) 260px, (min-width: 640px) 30vw, 100vw" widths={[320, 520, 800]} class="h-[150px] w-full sm:h-[170px]" />
+                    <span class="flex items-start gap-3">
+                      <input type="radio" name="locationKind" value={l.kind} class="mt-1 size-5 shrink-0 accent-ink" />
+                      <span>
+                        <span class="block text-[21px] leading-tight">{t(`book.s3.${l.key}.name`)}</span>
+                        <span class="block text-sm leading-[21px] text-muted">{t(`book.s3.${l.key}.text`)}</span>
+                        <span class="eyebrow mt-1.5 block text-[11px] text-muted">{t(`book.s3.${l.key}.tag`)}</span>
+                      </span>
+                    </span>
+                  </label>
+                ))
+              }
+            </div>
+            <label class="mt-5 flex cursor-pointer items-center gap-3">
+              <input type="radio" name="locationKind" value="OTHER" class="size-5 accent-ink" />
+              <span>{t("book.s3.other")}</span>
+            </label>
+          </fieldset>
+          <div data-place-wrap hidden class="mt-3 flex flex-col gap-1 sm:ml-8">
+            <label for="book-place" data-place-label class="field-label">{t("book.s3.otherField")}</label>
+            <input id="book-place" name="place" type="text" maxlength="160" autocomplete="off" class="field-input" aria-describedby="err-place" />
+            <p id="err-place" data-error-for="place" hidden class={err}></p>
+          </div>
+          <p data-error-for="locationKind" hidden class={err}></p>
+          <p class="mt-5 mb-0 text-sm text-muted italic">{t("book.s3.fee")}</p>
+        </section>
+
+        <!-- 4 · Your details -->
+        <section data-step="4" hidden>
+          <h1 tabindex="-1" class={h1} set:html={t("book.s4.h1")} />
+          <p class={lead}>{t("book.s4.lead")}</p>
+          <div class="grid gap-x-8 gap-y-6 sm:grid-cols-2">
+            <div class="flex flex-col gap-1">
+              <label for="book-first" class="field-label">{t("book.s4.firstName")}</label>
+              <input id="book-first" name="firstName" type="text" autocomplete="given-name" maxlength="80" required class="field-input" aria-describedby="err-first" />
+              <p id="err-first" data-error-for="firstName" hidden class={err}></p>
+            </div>
+            <div class="flex flex-col gap-1">
+              <label for="book-last" class="field-label">{t("book.s4.lastName")}</label>
+              <input id="book-last" name="lastName" type="text" autocomplete="family-name" maxlength="80" required class="field-input" aria-describedby="err-last" />
+              <p id="err-last" data-error-for="lastName" hidden class={err}></p>
+            </div>
+            <div class="flex flex-col gap-1">
+              <label for="book-email" class="field-label">{t("book.s4.email")}</label>
+              <input id="book-email" name="email" type="email" inputmode="email" autocomplete="email" maxlength="190" required class="field-input" aria-describedby="err-email" />
+              <p id="err-email" data-error-for="email" hidden class={err}></p>
+            </div>
+            <div class="flex flex-col gap-1">
+              <label for="book-phone" class="field-label">{t("book.s4.phone")}</label>
+              <input id="book-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" maxlength="40" required class="field-input" aria-describedby="err-phone" />
+              <p id="err-phone" data-error-for="phone" hidden class={err}></p>
+            </div>
+            <div class="flex flex-col gap-1">
+              <label for="book-people" class="field-label">{t("book.s4.people")} <span class="normal-case tracking-normal">· {t("book.s4.optional")}</span></label>
+              <select id="book-people" name="partySize" class="field-input">
+                <option value="">{t("book.s4.choose")}</option>
+                {Object.entries(peopleOptions).map(([v, label]) => <option value={v}>{label}</option>)}
+              </select>
+            </div>
+            <div class="flex flex-col gap-1">
+              <label for="book-heard" class="field-label">{t("book.s4.heard")} <span class="normal-case tracking-normal">· {t("book.s4.optional")}</span></label>
+              <select id="book-heard" name="heardFrom" class="field-input">
+                <option value="">{t("book.s4.choose")}</option>
+                {Object.entries(heardOptions).map(([v, label]) => <option value={v}>{label}</option>)}
+              </select>
+            </div>
+            <div data-only-graduation hidden class="flex flex-col gap-1">
+              <label for="book-school" class="field-label">{t("book.s4.school")}</label>
+              <input id="book-school" name="schoolAndColors" type="text" maxlength="200" placeholder={t("book.s4.schoolHint")} class="field-input" aria-describedby="err-school" />
+              <p id="err-school" data-error-for="schoolAndColors" hidden class={err}></p>
+            </div>
+            <div class="flex flex-col gap-1">
+              <label for="book-when" class="field-label">{t("book.s4.when")} <span class="normal-case tracking-normal">· {t("book.s4.optional")}</span></label>
+              <input id="book-when" name="photosNeededBy" type="date" class="field-input" aria-describedby="err-when" />
+              <p id="err-when" data-error-for="photosNeededBy" hidden class={err}></p>
+            </div>
+            <div class="flex flex-col gap-1 sm:col-span-2">
+              <label for="book-inspo" class="field-label">{t("book.s4.inspo")} <span class="normal-case tracking-normal">· {t("book.s4.optional")}</span></label>
+              <input id="book-inspo" name="inspo" type="text" maxlength="1000" placeholder={t("book.s4.inspoHint")} class="field-input" aria-describedby="err-inspo" />
+              <p id="err-inspo" data-error-for="inspo" hidden class={err}></p>
+            </div>
+            <div class="flex flex-col gap-1">
+              <label for="book-share" class="field-label">{t("book.s4.share")}</label>
+              <select id="book-share" name="sharePermission" class="field-input">
+                <option value="">{t("book.s4.choose")}</option>
+                {Object.entries(shareOptions).map(([v, label]) => <option value={v}>{label}</option>)}
+              </select>
+            </div>
+            <div data-only-partial hidden class="flex flex-col gap-1">
+              <label for="book-noshare" class="field-label">{t("book.s4.noShare")}</label>
+              <input id="book-noshare" name="doNotPostNotes" type="text" maxlength="500" placeholder={t("book.s4.noShareHint")} class="field-input" aria-describedby="err-noshare" />
+              <p id="err-noshare" data-error-for="doNotPostNotes" hidden class={err}></p>
+            </div>
+            <div class="flex flex-col gap-1 sm:col-span-2">
+              <label for="book-notes" class="field-label">{t("book.s4.notes")} <span class="normal-case tracking-normal">· {t("book.s4.optional")}</span></label>
+              <textarea id="book-notes" name="clientNotes" maxlength="2000" placeholder={t("book.s4.notesHint")} class="field-input" aria-describedby="err-notes"></textarea>
+              <p id="err-notes" data-error-for="clientNotes" hidden class={err}></p>
+            </div>
+            <label class="flex cursor-pointer items-start gap-3.5 text-base leading-6 sm:col-span-2">
+              <input type="checkbox" name="minorConsent" class="mt-0.5 size-5 shrink-0 accent-ink" />
+              <span>{t("book.s4.minor")}</span>
+            </label>
+            <!-- Honeypot: hidden from people and screen readers; bots fill it. -->
+            <div class="absolute -left-[9999px] h-px w-px overflow-hidden" aria-hidden="true">
+              <label for="book-website">{t("book.s4.website")}</label>
+              <input id="book-website" name="website" type="text" tabindex="-1" autocomplete="off" />
+            </div>
+          </div>
+        </section>
+
+        <!-- 5 · Review & send -->
+        <section data-step="5" hidden>
+          <h1 tabindex="-1" class={h1} set:html={t("book.s5.h1")} />
+          <p class={lead}>{t("book.s5.lead")}</p>
+          <div data-review class="border-b border-line"></div>
+
+          <h2 class="eyebrow mt-10 mb-3">{t("book.s5.how")}</h2>
+          <ol class="m-0 list-none border-b border-line p-0">
+            {
+              howItems.map((item, i) => (
+                <li class="grid grid-cols-[44px_minmax(0,1fr)] gap-3 border-t border-line py-4">
+                  <span class="text-2xl text-muted italic">{String(i + 1).padStart(2, "0")}</span>
+                  <span>
+                    <span class="block text-[20px]">{item.title}</span>
+                    <span data-how-text={i} class="block text-muted">{item.text}</span>
+                  </span>
+                </li>
+              ))
+            }
+          </ol>
+
+          <h2 class="eyebrow mt-10 mb-3">{t("book.s5.policy")}</h2>
+          <PolicyList lang={lang} ids={["deposit", "cancelling", "rescheduling", "late", "delivery", "minors"]} />
+          <p class="mt-3 mb-0 text-sm"><a href={localizePath("/policies/", lang)} target="_blank" rel="noopener" class="underline">{t("common.readFullPolicies")}</a></p>
+
+          <label class="mt-6 flex cursor-pointer items-start gap-3.5">
+            <input type="checkbox" name="policyAccepted" class="mt-1 size-5 shrink-0 accent-ink" aria-describedby="err-policy" />
+            <span>{t("book.s5.accept")}</span>
+          </label>
+          <p id="err-policy" data-error-for="policyAccepted" hidden class={err}></p>
+        </section>
+
+        <p data-step-error role="alert" class="mt-6 mb-0 min-h-5 text-[15px] text-danger"></p>
+        <div class="mt-6 flex items-center justify-between gap-4 border-t border-line pt-7">
+          <button type="button" data-back hidden class="link-line cursor-pointer">{t("book.nav.back")}</button>
+          <span class="flex-1"></span>
+          <span class="flex items-center gap-6">
+            <span data-no-payment hidden class="hidden text-[15px] text-muted italic sm:inline">{t("book.s5.noPayment")}</span>
+            <button type="submit" data-next class="btn btn-primary disabled:cursor-wait disabled:opacity-70">{t("book.nav.continue")}</button>
+          </span>
+        </div>
+      </form>
+
+      <aside class="flex flex-col self-start bg-soft p-6 lg:sticky lg:top-6 lg:p-8" aria-label={t("book.summary.title")}>
+        <h2 class="eyebrow mt-0 mb-3.5">{t("book.summary.title")}</h2>
+        <dl class="m-0">
+          <div class="flex justify-between gap-4 border-t border-line py-3.5">
+            <dt class="eyebrow text-muted">{t("book.summary.session")}</dt>
+            <dd data-sum="session" class="m-0 text-right text-muted italic">{t("book.summary.notYet")}</dd>
+          </div>
+          <div data-sum-row="extras" hidden class="flex justify-between gap-4 border-t border-line py-3.5">
+            <dt class="eyebrow text-muted">{t("book.summary.extras")}</dt>
+            <dd data-sum="extras" class="m-0 text-right whitespace-pre-line"></dd>
+          </div>
+          <div class="flex justify-between gap-4 border-t border-line py-3.5">
+            <dt class="eyebrow text-muted">{t("book.summary.date")}</dt>
+            <dd data-sum="date" class="m-0 text-right text-muted italic">{t("book.summary.notYet")}</dd>
+          </div>
+          <div class="flex justify-between gap-4 border-t border-line py-3.5">
+            <dt class="eyebrow text-muted">{t("book.summary.location")}</dt>
+            <dd data-sum="location" class="m-0 text-right break-words text-muted italic">{t("book.summary.notYet")}</dd>
+          </div>
+          <div class="flex justify-between border-t border-ink pt-[18px] pb-1.5">
+            <dt class="eyebrow">{t("book.summary.total")}</dt>
+            <dd data-sum="total" class="m-0 text-2xl">—</dd>
+          </div>
+          <div class="flex justify-between gap-4 text-[15px] text-muted">
+            <dt data-sum="deposit-label">{t("book.summary.deposit")}</dt>
+            <dd data-sum="deposit" class="m-0">—</dd>
+          </div>
+          <div class="flex justify-between gap-4 text-[15px] text-muted">
+            <dt>{t("book.summary.balance")}</dt>
+            <dd data-sum="balance" class="m-0">—</dd>
+          </div>
+        </dl>
+        {email && <p class="mt-6 mb-0 text-sm leading-[21px] text-muted italic">{t("book.summary.questions", { email })}</p>}
+      </aside>
+    </div>
+
+    <!-- Request sent (BookingConfirmed.dc.html) -->
+    <section data-done hidden class="mt-8 grid gap-12 lg:mt-16 lg:grid-cols-[minmax(0,1fr)_460px] lg:gap-20">
+      <div>
+        <p data-done-code class="eyebrow m-0 text-muted"></p>
+        <h1 data-done-h1 tabindex="-1" class="mt-3.5 mb-4 text-[40px] leading-[1.05] font-normal tracking-[-0.015em] focus:outline-none lg:text-[56px]"></h1>
+        <p class="mt-0 mb-10 text-[19px] leading-[30px] lg:text-[21px] lg:leading-8">
+          <span data-done-when></span><br />
+          <span data-done-reply></span>
+        </p>
+        <ol class="m-0 list-none border-b border-line p-0">
+          {
+            doneSteps.map((item, i) => (
+              <li class="grid grid-cols-[48px_minmax(0,1fr)] gap-4 border-t border-line py-[18px] sm:grid-cols-[56px_minmax(0,1fr)]">
+                <span class="text-[28px] text-muted italic">{String(i + 1).padStart(2, "0")}</span>
+                <span>
+                  <span class="mb-1 block text-[21px]">{item.title}</span>
+                  <span data-done-text={i} class="block text-muted">{item.text}</span>
+                </span>
+              </li>
+            ))
+          }
+        </ol>
+        <div class="mt-9 flex flex-wrap items-center gap-5">
+          <a href={localizePath("/", lang)} class="btn btn-primary">{t("book.done.back")}</a>
+          <a href={localizePath("/services/", lang)} class="link-line">{t("book.done.services")}</a>
+        </div>
+      </div>
+      <Photo photo={photo("graduation-cap-golden-hour")} lang={lang} sizes="(min-width: 1024px) 460px, 100vw" widths={[460, 640, 920]} class="hidden h-[600px] w-full lg:block" />
+    </section>
+  </div>
+
+  <script type="application/json" id="book-data" set:html={JSON.stringify(data).replace(/</g, "\\u003c")} />
+</Layout>
+
+<script>
+  import { mountBooking } from "./book/book";
+
+  const root = document.querySelector<HTMLElement>("[data-book]");
+  const raw = document.getElementById("book-data")?.textContent;
+  if (root && raw) mountBooking(root, JSON.parse(raw));
+</script>

@@ -107,7 +107,18 @@ al activarla) **declarando las dudas abiertas**. Patrón: `admin/src/app/pages/b
 
 ## Language
 
-Public landing copy matches whatever language the client's business operates in (currently
-English, per the pricing sheet) — admin/client portal UI text should match. If the project later
-goes bilingual (en/es), that's a deliberate decision to make with the user, not something to
-half-introduce by mixing languages in new components.
+Decided (2026-10-26): the landing is bilingual — English at `/`, Spanish at `/es/` (static pages,
+hreflang). Copy lives in `src/i18n/en.json` / `es.json` (same keys in both); pages are thin wrappers
+around `src/views/*.astro` that take `lang`. `public/lang.js` sends a Spanish browser to `/es/` on the
+first visit and remembers the switch in `pba-client-lang` (shared with the client portal). The admin
+stays English only.
+
+## The public landing (current state)
+
+- No UI framework: interactive bits are Astro `<script>`s bundled to `/_astro/*.js`
+  (`vite.build.assetsInlineLimit: 0`) so the CSP in `nginx.conf` can be `script-src 'self'`. Adding a
+  React island means adding the hydration script hashes to that CSP.
+- Photos: `src/data/photos.ts` (alt EN/ES, where each one appears), files from `scripts/prepare-photos.mjs`,
+  rendered with `components/site/Photo.astro` (`<Picture>` WebP, widths/sizes).
+- Business data only through `src/data/site.ts` (namespace import of `shared/site.js`) and
+  `shared/services.js`.

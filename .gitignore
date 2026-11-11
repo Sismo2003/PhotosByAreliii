@@ -78,6 +78,8 @@ database/generated/
 
 # Runtime data: photos, uploads, dumps, databases
 Backend/storage/
+# Email settings file (docs/correos.md §3) — mail server password, encrypted
+Backend/var/
 Backend/uploads/
 *.sql.gz
 *.dump
@@ -106,6 +108,9 @@ Backend/uploads/
 # …and the sign-in background: published on purpose, GPS/camera data stripped, copyright embedded
 # (docs/derechos-imagenes.md). Any other photo stays out.
 !client/public/login.jpg
+# …and the public site's photos: web copies made by Frontend/scripts/prepare-photos.mjs (all EXIF/GPS
+# stripped, copyright written). Originals stay in "Photos By Areliii LLC/" (ignored).
+!Frontend/src/assets/photos/*.jpg
 
 # Scratch / OS / editor
 _t*.mjs

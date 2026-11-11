@@ -1,0 +1,30 @@
+---
+// ES / EN switch (Main.dc.html header). Links to the same page in the other language; the click is
+// remembered by public/lang.js (data-set-lang) so the next visit opens in that language.
+import { LANGS, localizePath, stripLang, useT, type Lang } from "../../i18n";
+
+const { lang } = Astro.props as { lang: Lang };
+const { t } = useT(lang);
+const base = stripLang(Astro.url.pathname);
+const order: Lang[] = ["es", "en"];
+---
+
+<div role="group" aria-label={t("nav.language")} class="eyebrow flex items-center gap-1.5">
+  {
+    order.filter((l) => LANGS.includes(l)).map((l, i) => (
+      <>
+        {i > 0 && <span class="text-faint" aria-hidden="true">/</span>}
+        <a
+          href={localizePath(base, l)}
+          hreflang={l}
+          lang={l}
+          data-set-lang={l}
+          aria-current={l === lang ? "true" : undefined}
+          class:list={["inline-flex min-h-11 items-center", l === lang ? "text-ink underline underline-offset-4" : "text-muted"]}
+        >
+          {l.toUpperCase()}
+        </a>
+      </>
+    ))
+  }
+</div>

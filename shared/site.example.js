@@ -11,6 +11,8 @@ export const BRAND = {
   name: "Photos By Areliii",
   legalName: "Photos By Areliii LLC",
   owner: "Areli",
+  // Full name, for the "founder" in the structured data (SEO). "" = leave it out.
+  ownerFullName: "Areli Example",
   domain: "photosbyareliii.com",
 };
 
@@ -25,8 +27,18 @@ export const CONTACT = {
 };
 
 export const SOCIAL = {
-  instagramHandle: "photosbyareliii",
-  instagram: "https://instagram.com/photosbyareliii",
+  instagramHandle: "photosbyareliiillc",
+  instagram: "https://instagram.com/photosbyareliiillc",
+};
+
+// Where sessions happen (no studio address, ever). Feeds local SEO: areaServed in the structured
+// data and the "Portrait photographer · Arizona" line.
+export const AREA = {
+  region: "Arizona",
+  regionCode: "AZ",
+  country: "US",
+  // Cities/areas to name in the structured data; [] = just the region.
+  areaServed: [],
 };
 
 // Payments are manual (no gateway): the client sends the money and Areli records it in the admin.

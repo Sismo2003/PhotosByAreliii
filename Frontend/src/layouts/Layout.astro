@@ -1,49 +1,91 @@
 ---
-// Shared <head>: unique title/description per page, canonical, Open Graph and LocalBusiness JSON-LD.
-// All business data comes from shared/site.js (skills site-config + landing-seo), never typed here.
+// Shared page shell: <head> with unique title/description, canonical + hreflang (en/es), Open Graph,
+// the business JSON-LD (+ per-page nodes), header and footer. All business data comes from
+// shared/site.js and shared/services.js (skills site-config + landing-seo), never typed here.
 import "../styles.css";
-import { BRAND, CONTACT, SOCIAL } from "@shared/site";
+import { getImage } from "astro:assets";
+import { LOGO } from "@shared/brand";
+import Header from "../components/site/Header.astro";
+import Footer from "../components/site/Footer.astro";
+import { BRAND, SHARED_VARS } from "../data/site";
+import { OG_PHOTO } from "../data/photos";
+import { HTML_LANG, LANGS, OG_LOCALE, localizePath, stripLang, useT, type Lang } from "../i18n";
+import { businessNode } from "../seo/jsonld";
 
 interface Props {
+  lang: Lang;
   title: string;
   description: string;
+  /** Extra JSON-LD nodes for this page (Service, BreadcrumbList, FAQPage…). */
+  jsonLd?: object[];
+  /** Image for social previews; defaults to OG_PHOTO. */
+  image?: ImageMetadata;
+  /** Pages without a twin in the other language (404) skip hreflang. */
+  alternates?: boolean;
+  noindex?: boolean;
 }
 
-const { title, description } = Astro.props;
-const canonical = new URL(Astro.url.pathname, Astro.site).href;
-const fullTitle = `${title} | ${BRAND.name}`;
-// The temporary domain must not be indexed; flip PUBLIC_INDEXABLE=true when the official one is live.
-const indexable = import.meta.env.PUBLIC_INDEXABLE === "true";
+const { lang, title, description, jsonLd = [], image, alternates = true, noindex = false } = Astro.props;
+const { t } = useT(lang, SHARED_VARS);
+const site = Astro.site!;
+const basePath = stripLang(Astro.url.pathname);
+const canonical = new URL(localizePath(basePath, lang), site).href;
+const isHome = basePath === "/";
+const fullTitle = isHome ? title : `${title} | ${BRAND.name}`;
+// The temporary domain must not be indexed; PUBLIC_INDEXABLE=true (build time) when the official one is live.
+const indexable = import.meta.env.PUBLIC_INDEXABLE === "true" && !noindex;
 
-const jsonLd = {
-  "@context": "https://schema.org",
-  "@type": "PhotographyBusiness",
-  name: BRAND.name,
-  url: Astro.site?.href,
-  telephone: CONTACT.phoneE164 || undefined,
-  email: CONTACT.emails?.primary || undefined,
-  sameAs: Object.values(SOCIAL).filter((v) => typeof v === "string" && v.startsWith("http")),
-};
+const og = await getImage({ src: image ?? OG_PHOTO.src, width: 1200, height: 630, fit: "cover", format: "jpg", quality: 82 });
+const ogUrl = new URL(og.src, site).href;
+
+const logoFiles = import.meta.glob<string>("../../../shared/brand/*.png", { eager: true, query: "?url", import: "default" });
+const logoSrc = Object.entries(logoFiles).find(([key]) => key.endsWith(`/shared/${LOGO.onLight}`))?.[1] ?? "";
+const logoUrl = new URL(logoSrc, site).href;
+
+const graph = { "@context": "https://schema.org", "@graph": [businessNode(site, lang, logoUrl, ogUrl), ...jsonLd] };
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang={HTML_LANG[lang]}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
+    {
+      alternates &&
+        LANGS.map((l) => <link rel="alternate" hreflang={HTML_LANG[l]} href={new URL(localizePath(basePath, l), site).href} />)
+    }
+    {alternates && <link rel="alternate" hreflang="x-default" href={new URL(localizePath(basePath, "en"), site).href} />}
+    <meta name="robots" content={indexable ? "index, follow, max-image-preview:large" : "noindex, nofollow"} />
+    <meta name="theme-color" content="#ffffff" />
+    <meta name="author" content={BRAND.legalName} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <meta name="robots" content={indexable ? "index, follow" : "noindex, nofollow"} />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={BRAND.name} />
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
-    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+    <meta property="og:image" content={ogUrl} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content={OG_LOCALE[lang]} />
+    {LANGS.filter((l) => l !== lang).map((l) => <meta property="og:locale:alternate" content={OG_LOCALE[l]} />)}
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <!-- Language redirect must run before paint: a classic script from 'self' (public/lang.js). -->
+    <script is:inline src="/lang.js"></script>
+    <script type="application/ld+json" set:html={JSON.stringify(graph)} />
   </head>
-  <body>
-    <slot />
+  <body class="flex min-h-screen flex-col">
+    <a href="#main" class="sr-only-focusable eyebrow absolute top-2 left-2 z-50 bg-paper px-3 py-2">{t("nav.skip")}</a>
+    <Header lang={lang} />
+    <main id="main" class="flex-1">
+      <slot />
+    </main>
+    <Footer lang={lang} />
   </body>
 </html>

@@ -1,0 +1,50 @@
+---
+// Site footer (Main.dc.html): logo + line, contact, pages, services; legal row.
+import Logo from "../Logo.astro";
+import AccountLink from "./AccountLink.astro";
+import { BRAND, CONTACT, SERVICES, SHARED_VARS, SOCIAL } from "../../data/site";
+import { localizePath, useT, type Lang } from "../../i18n";
+import { formatPhone, telHref } from "../../utils/phone";
+import { studioNow } from "../../utils/date";
+
+const { lang } = Astro.props as { lang: Lang };
+const { t } = useT(lang, SHARED_VARS);
+const email = CONTACT.emails?.primary;
+const L = (p: string) => localizePath(p, lang);
+const colTitle = "eyebrow mb-1.5 text-muted";
+---
+
+<footer class="mt-auto border-t border-line">
+  <div class="page-x container-site grid grid-cols-2 gap-x-4 gap-y-8 py-10 lg:grid-cols-[minmax(0,1.4fr)_repeat(3,minmax(0,1fr))] lg:gap-10 lg:pt-16 lg:pb-14">
+    <div class="col-span-2 flex flex-col gap-5 lg:col-span-1">
+      <a href={L("/")} aria-label={BRAND.name}><Logo class="h-auto w-[130px] lg:w-[150px]" /></a>
+      <p class="m-0 hidden max-w-[260px] text-base leading-6 text-muted lg:block">{t("footer.about")}</p>
+    </div>
+    <div class="flex flex-col gap-2.5 text-base leading-6">
+      <h2 class={colTitle}>{t("footer.contact")}</h2>
+      {email && <a href={`mailto:${email}`} class="break-all">{email}</a>}
+      {CONTACT.phoneE164 && <a href={telHref(CONTACT.phoneE164)}>{formatPhone(CONTACT.phoneE164)}</a>}
+      {SOCIAL.instagram && <a href={SOCIAL.instagram} target="_blank" rel="me noopener">Instagram @{SOCIAL.instagramHandle}</a>}
+    </div>
+    <div class="flex flex-col gap-2.5 text-base leading-6">
+      <h2 class={colTitle}>{t("footer.pages")}</h2>
+      <a href={L("/")}>{t("nav.home")}</a>
+      <a href={L("/") + "#portfolio"}>{t("nav.portfolio")}</a>
+      <a href={L("/services/")}>{t("nav.services")}</a>
+      <a href={L("/book/")}>{t("common.bookSession")}</a>
+      <a href={L("/policies/")}>{t("footer.policies")}</a>
+      <AccountLink lang={lang} />
+    </div>
+    <div class="flex flex-col gap-2.5 text-base leading-6">
+      <h2 class={colTitle}>{t("footer.services")}</h2>
+      {SERVICES.map((s) => <a href={L(`/services/${s.slug}/`)}>{t(`services.${s.slug}.name`)}</a>)}
+    </div>
+  </div>
+  <div class="page-x container-site flex flex-wrap justify-between gap-4 border-t border-line py-5 text-[11px] leading-4 font-medium tracking-[0.14em] text-muted uppercase">
+    <span>© {studioNow().year} {BRAND.legalName}</span>
+    <span class="flex gap-6">
+      <a href={L("/privacy/")}>{t("footer.privacy")}</a>
+      <a href={L("/terms/")}>{t("footer.terms")}</a>
+    </span>
+  </div>
+</footer>

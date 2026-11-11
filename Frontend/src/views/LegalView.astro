@@ -1,0 +1,27 @@
+---
+// /privacy and /terms — short, plain-language texts (i18n "privacy" / "terms").
+import Layout from "../layouts/Layout.astro";
+import { LEGAL_UPDATED, SHARED_VARS } from "../data/site";
+import { useT, type Lang } from "../i18n";
+import { formatLongDate } from "../utils/date";
+
+const { lang, doc } = Astro.props as { lang: Lang; doc: "privacy" | "terms" };
+const { t, tl } = useT(lang, SHARED_VARS);
+const sections = tl<{ title: string; items: string[] }[]>(`${doc}.sections`);
+---
+
+<Layout lang={lang} title={t(`meta.${doc}Title`)} description={t(`meta.${doc}Description`)}>
+  <article class="page-x container-site prose-legal max-w-[860px] pt-8 pb-[72px] text-[18px] leading-relaxed lg:pt-10 lg:pb-[120px]">
+    <h1 class="mt-0 mb-3 text-[40px] leading-[1.05] font-normal tracking-[-0.02em] lg:text-[56px]">{t(`${doc}.h1`)}</h1>
+    <p class="eyebrow mt-0 mb-8 text-muted">{t(`${doc}.updated`, { date: formatLongDate(LEGAL_UPDATED, lang) })}</p>
+    <p class="m-0 text-[19px] leading-[29px]">{t(`${doc}.intro`)}</p>
+    {
+      sections.map((s) => (
+        <section>
+          <h2>{s.title}</h2>
+          <ul>{s.items.map((i) => <li>{i}</li>)}</ul>
+        </section>
+      ))
+    }
+  </article>
+</Layout>

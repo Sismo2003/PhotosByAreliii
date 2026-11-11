@@ -1,0 +1,25 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Hero from "../components/home/Hero.astro";
+import Moments from "../components/home/Moments.astro";
+import Portfolio from "../components/home/Portfolio.astro";
+import ServiceRows from "../components/site/ServiceRows.astro";
+import { SHARED_VARS } from "../data/site";
+import { localizePath, useT, type Lang } from "../i18n";
+
+const { lang } = Astro.props as { lang: Lang };
+const { t } = useT(lang, SHARED_VARS);
+---
+
+<Layout lang={lang} title={`${SHARED_VARS.brand} · ${t("meta.homeTitle")}`} description={t("meta.homeDescription")}>
+  <Hero lang={lang} />
+  <Moments lang={lang} />
+  <Portfolio lang={lang} />
+  <section id="services" class="page-x container-site py-[72px] lg:py-[120px]">
+    <div class="mb-4 flex items-baseline justify-between lg:mb-7">
+      <h2 class="eyebrow m-0">{t("home.servicesTitle")}</h2>
+      <a href={localizePath("/services/", lang)} class="link-line">{t("common.allServices")}</a>
+    </div>
+    <ServiceRows lang={lang} variant="grid" />
+  </section>
+</Layout>
