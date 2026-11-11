@@ -72,7 +72,7 @@ Decisiones:
   están agotados y el firewall solo deja pasar `172.16.0.0/12`: con otra subred la API resuelve `mysql` pero el TCP
   se pierde en silencio. Elige un /24 libre por proyecto.
 - **Contenedores endurecidos**: sistema de archivos de solo lectura, `no-new-privileges`, límites de memoria, y la
-  API corre como uid 1000 (sin root). Solo `photos/` es escribible.
+  API corre como uid 1000 (sin root). Solo `photos/` y `config/` son escribibles.
 - **Login limitado en el borde**: 10 intentos/min por IP (`/api/auth/login`), además del limitador de la API.
 - **El sitio no se indexa** en el dominio temporal (`PUBLIC_INDEXABLE=false` → `noindex` + `robots.txt` de bloqueo).
 
@@ -88,10 +88,10 @@ Decisiones:
 
 | Qué | Dónde |
 |---|---|
-| Secretos de la API (`JWT_SECRET`, `GALLERY_ENC_KEY`, SMTP…) | `<repo>/Backend/.env` en el servidor (600) |
+| Secretos de la API (`JWT_SECRET`, `GALLERY_ENC_KEY`, `CONFIG_SECRET_KEY`…) | `<repo>/Backend/.env` en el servidor (600) |
 | Dominio, certificado, rutas, passwords de MySQL, tag desplegado | `<repo>/deploy/.env` en el servidor (600) — plantilla: `deploy/.env.template` |
 | Datos reales del negocio (teléfono, correos…) | secret `SITE_JS_B64` en GitHub (se hornea en las imágenes) |
-| Fotos y base de datos | `$DATA_DIR` (por defecto `/srv/pba/{photos,mysql}`) |
+| Fotos, base de datos y config. de correo | `$DATA_DIR` (por defecto `/srv/pba/{photos,mysql,config}`); `config/settings.json` lo edita Areli en Settings → Email |
 | Vhost | `$NGINX_CONF_DIR/pba.conf` (generado por `rollout.sh`) |
 | Trigger del bot · permiso sudo | `/usr/local/bin/pba-deploy-trigger` · `/etc/sudoers.d/pba-deploy` |
 | Llave de CI (pública) | `~<bot>/.ssh/authorized_keys` con `command=`, `restrict`, `from=100.64.0.0/10` |
@@ -124,7 +124,7 @@ Todo por Tailscale (`ssh -p <puerto> <usuario>@<host-tailscale>`).
 2. **Preparar** (carpetas, red `nginx`, plantillas de `.env`; no toca nada más):
    `cd /root/photosByArelli && sudo deploy/server-setup.sh`
 3. **Rellenar** `deploy/.env` (contraseñas: `openssl rand -hex 24`) y `Backend/.env`
-   (`JWT_SECRET`, `GALLERY_ENC_KEY`, SMTP…; ver `Backend/.env.example`). `chmod 600` ambos.
+   (`JWT_SECRET`, `GALLERY_ENC_KEY`, `CONFIG_SECRET_KEY`…; ver `Backend/.env.example`). `chmod 600` ambos.
 4. **Llave de CI propia** (distinta de la de otros proyectos: no puede disparar deploys ajenos):
    ```bash
    ssh-keygen -t ed25519 -N '' -C pba-ci -f /root/pba-ci
@@ -173,6 +173,7 @@ Pensado para que sea configuración, no reescritura:
    # en el servidor viejo
    docker exec pba-mysql mysqldump -uroot -p"$MYSQL_ROOT_PASSWORD" --single-transaction --routines photosbyarelli | gzip > pba.sql.gz
    rsync -a /srv/pba/photos/ nuevo:/srv/pba/photos/        # por Tailscale
+   rsync -a /srv/pba/config/ nuevo:/srv/pba/config/        # settings.json de correo (mismo CONFIG_SECRET_KEY)
    # en el nuevo, tras el primer rollout (MySQL ya sano)
    gunzip -c pba.sql.gz | docker exec -i pba-mysql mysql -uroot -p"$MYSQL_ROOT_PASSWORD" photosbyarelli
    ```
@@ -197,6 +198,7 @@ tail -f /var/log/pba-deploy.log                      # despliegues
 ./rollout.sh sha-<12 primeros del commit anterior>   # ROLLBACK exacto (como root)
 docker exec -it pba-mysql mysql -uroot -p            # consola SQL
 docker exec pba-mysql mysqldump -uroot -p"$MYSQL_ROOT_PASSWORD" --single-transaction photosbyarelli | gzip > /root/backups/pba-$(date +%F).sql.gz
+cp /srv/pba/config/settings.json /root/backups/settings-$(date +%F).json   # config. de correo (contraseñas cifradas)
 ```
 
 Las migraciones solo avanzan: un rollback de imagen **no** deshace el esquema. Para cambios destructivos, haz
