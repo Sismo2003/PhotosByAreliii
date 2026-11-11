@@ -29,6 +29,8 @@ map $http_upgrade $pba_connection_upgrade {
 
 # Brute force against the login endpoint is cut at the edge, before an argon2 hash is spent per try.
 limit_req_zone $binary_remote_addr zone=pba_login:10m rate=10r/m;
+# Booking requests from the public /book form (no session): a person sends one; a bot sends hundreds.
+limit_req_zone $binary_remote_addr zone=pba_book:10m rate=3r/m;
 
 # --- HTTP → HTTPS --------------------------------------------------------------
 server {
@@ -74,6 +76,15 @@ server {
   # Sign-in attempts only (tight limit, then 429).
   location = /api/auth/login {
     limit_req zone=pba_login burst=5 nodelay;
+    limit_req_status 429;
+    client_max_body_size 64k;
+    set $pba_api http://pba-api:4000;
+    proxy_pass $pba_api;
+  }
+
+  # Public booking requests (/book). Express limits per IP again (Backend/routes/public.routes.js).
+  location = /api/public/bookings {
+    limit_req zone=pba_book burst=3 nodelay;
     limit_req_status 429;
     client_max_body_size 64k;
     set $pba_api http://pba-api:4000;

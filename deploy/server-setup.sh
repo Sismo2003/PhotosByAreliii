@@ -55,7 +55,7 @@ fi
 if [ ! -f "$REPO_DIR/Backend/.env" ]; then
   cp "$REPO_DIR/Backend/.env.example" "$REPO_DIR/Backend/.env"
   chmod 600 "$REPO_DIR/Backend/.env"
-  log "created Backend/.env — FILL IT IN (JWT_SECRET, GALLERY_ENC_KEY, SMTP…)"
+  log "created Backend/.env — FILL IT IN (JWT_SECRET, GALLERY_ENC_KEY, CONFIG_SECRET_KEY…)"
 fi
 if [ ! -f "$REPO_DIR/shared/site.js" ]; then
   cp "$REPO_DIR/shared/site.example.js" "$REPO_DIR/shared/site.js"
@@ -67,10 +67,11 @@ DATA_DIR="${DATA_DIR:-/srv/pba}"
 [[ "$DATA_DIR" =~ ^/[A-Za-z0-9._/-]+$ ]] || die "DATA_DIR invalid in deploy/.env"
 
 # --- 3. Data folders + shared network -------------------------------------------------------------
-mkdir -p "$DATA_DIR/photos" "$DATA_DIR/mysql"
-chown 1000:1000 "$DATA_DIR/photos"   # the API container runs as uid 1000
+mkdir -p "$DATA_DIR/photos" "$DATA_DIR/mysql" "$DATA_DIR/config"
+chown 1000:1000 "$DATA_DIR/photos" "$DATA_DIR/config"   # the API container runs as uid 1000
 chmod 750 "$DATA_DIR" "$DATA_DIR/photos"
-log "data folders ready in $DATA_DIR (photos/ → uid 1000, mysql/ → managed by the mysql image)"
+chmod 700 "$DATA_DIR/config"                             # email settings (SMTP password encrypted)
+log "data folders ready in $DATA_DIR (photos/ + config/ → uid 1000, mysql/ → managed by the mysql image)"
 
 docker network inspect nginx >/dev/null 2>&1 || { docker network create nginx >/dev/null; log "created network: nginx"; }
 

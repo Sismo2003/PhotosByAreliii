@@ -58,7 +58,7 @@ services:
     image: ${IMAGE_PREFIX:-ghcr.io/sismo2003/pba}-api:${PBA_TAG:-latest}
     container_name: pba-api
     env_file:
-      - ../Backend/.env # secrets (JWT_SECRET, GALLERY_ENC_KEY, SMTP…) — server only, never in git
+      - ../Backend/.env # secrets (JWT_SECRET, GALLERY_ENC_KEY, CONFIG_SECRET_KEY…) — server only, never in git
     environment:
       # Deployment properties win over whatever Backend/.env says.
       NODE_ENV: production
@@ -66,8 +66,10 @@ services:
       DATABASE_URL: mysql://${MYSQL_USER:-pba}:${MYSQL_PASSWORD}@mysql:3306/${MYSQL_DATABASE:-photosbyarelli}
       CLIENT_ORIGIN: https://${APP_DOMAIN:?missing APP_DOMAIN in deploy/.env}
       STORAGE_PATH: /data/storage
+      CONFIG_PATH: /data/config/settings.json # email settings Areli edits (docs/correos.md §3)
     volumes:
       - ${DATA_DIR:-/srv/pba}/photos:/data/storage # photos live on the host disk, owned by uid 1000
+      - ${DATA_DIR:-/srv/pba}/config:/data/config # settings.json (+ .bak/.tmp), uid 1000, a few KB
     user: "1000:1000"
     read_only: true
     tmpfs: ["/tmp:size=256m"]

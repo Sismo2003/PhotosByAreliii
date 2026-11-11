@@ -9,6 +9,7 @@
 **/node_modules
 Backend/.env
 Backend/storage
+Backend/var
 Backend/_t*.mjs
 database/.env
 database/generated
