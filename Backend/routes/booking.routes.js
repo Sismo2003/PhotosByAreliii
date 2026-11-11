@@ -8,6 +8,7 @@ import {
   clientSearchQuery,
   createBookingBody,
   emptyBody,
+  followUpEmailBody,
   listQuery,
   paymentBody,
   rebookBody,
@@ -37,6 +38,7 @@ import {
   archiveBooking,
   unarchiveBooking,
   markReviewReceived,
+  sendFollowUpEmail,
   setRebookReminder,
 } from '../controllers/booking.controller.js';
 
@@ -70,6 +72,7 @@ router.post('/:id/reopen', validate(emptyBody), reopenBooking);
 router.post('/:id/archive', validate(emptyBody), archiveBooking);
 router.post('/:id/unarchive', validate(emptyBody), unarchiveBooking);
 router.post('/:id/review-received', validate(emptyBody), markReviewReceived);
+router.post('/:id/email', validate(followUpEmailBody), sendFollowUpEmail);
 router.post('/:id/rebook-reminder', validate(rebookBody), setRebookReminder);
 
 export default router;

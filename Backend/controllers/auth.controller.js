@@ -6,6 +6,7 @@ import { toE164 } from '../utils/phone.js';
 import { nowForDb } from '../utils/date.js';
 import { PASSWORD_MAX, checkPassword } from '../utils/password-rules.js';
 import { HttpError, sendError } from '../utils/http.js';
+import { queueEmail } from '../services/email/outbox.js';
 
 const COOKIE_OPTIONS = {
   httpOnly: true,
@@ -136,6 +137,8 @@ export const changePassword = async (req, res) => {
       }
     } else {
       await UserModel.setPassword(user.id, hash, changedAt);
+      // Security notice (docs/correos.md #15); a failure to queue must not undo the change.
+      if (user.clientId) await queueEmail(null, 'account.password_changed', { clientId: user.clientId }).catch((e) => console.error('[email]', e));
     }
 
     // Every other session (a stolen cookie, another device) dies here; this one gets a fresh token.

@@ -16,6 +16,7 @@ import { deriveContext, deriveBooking, formatCents, withSettingsFallback } from 
 import { CLIENT_TABS, REACH_OUT_DAYS, clientLoginWhere, clientTabWhere, deriveClient } from '../services/client-derive.js';
 import { REBOOK_LABEL, defaultRebookDay } from './booking.model.js';
 import { syncLoginEmail } from './login-email.js';
+import { queueEmail } from '../services/email/outbox.js';
 
 const MAX_PAGE_SIZE = 100;
 const HISTORY_LIMIT = 50;
@@ -296,8 +297,12 @@ class ClientModel {
       await tx.client.update({ where: { id }, data: Object.fromEntries(changed.map((k) => [k, data[k]])) });
 
       if (changed.includes('email')) {
-        // INTEGRATION(correos): queue the "your login email changed" notice to data.email here
-        // (docs/clients-page-integraciones.md).
+        // Only a client with a login signs in with it. Both addresses hear about it (docs/correos.md
+        // #16): the old one in case the change wasn't expected.
+        const change = { oldEmail: current.email, newEmail: data.email };
+        for (const to of current.user ? new Set([current.email, data.email]) : []) {
+          await queueEmail(tx, 'account.email_changed', { to, clientId: id, locale: current.locale, data: { change } });
+        }
         await event(tx, current, actorId, 'client.email_changed', `Email changed from ${current.email} to ${data.email}`, {
           from: current.email,
           to: data.email,

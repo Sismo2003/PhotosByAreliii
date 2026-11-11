@@ -16,6 +16,7 @@ import * as storage from '../services/storage.js';
 import { readExif } from '../services/photo-meta.js';
 import { rightsFor } from '../services/photo-rights.js';
 import { computeFocus } from '../services/photo-focus.js';
+import { queueEmail } from '../services/email/outbox.js';
 
 const MAX_PAGE_SIZE = 100;
 const DEFAULT_SETS = ['Highlights', 'Portraits', 'With family', 'Details', 'Getting ready'];
@@ -479,8 +480,8 @@ class GalleryModel {
 
   // ---- Delivery ----
 
-  // Marks the gallery delivered. Sending the email is the Correos module's job:
-  // INTEGRATION(correos) — see docs/galleries-pendientes.md. Resending keeps the same dates and PIN.
+  // Marks the gallery delivered and queues "Your photos are ready" (or "sent again") in the same
+  // transaction (docs/correos.md #17–18). Resending keeps the same dates and PIN.
   static async deliver(id, { to, subject, message, newPin }, actorId) {
     await prisma.$transaction(async (tx) => {
       const g = await tx.gallery.findUnique({ where: { id }, include: { client: true } });
@@ -504,6 +505,13 @@ class GalleryModel {
       if (g.pinRequired && (newPin || !g.downloadPinEnc)) data.downloadPinEnc = encrypt(randomPin());
       await tx.gallery.update({ where: { id }, data });
       await event(tx, g, actorId, first ? 'gallery.delivered' : 'gallery.redelivered', first ? `Gallery delivered to ${data.deliveredToEmail}` : `Gallery sent again to ${data.deliveredToEmail}`, { to: data.deliveredToEmail });
+      // A client who never signed in gets the full "ready" email again, with a new temporary password.
+      const user = await tx.user.findUnique({ where: { clientId: g.clientId }, select: { lastLoginAt: true } });
+      const issueLogin = g.privacy === 'CLIENT_LOGIN' && !user?.lastLoginAt;
+      await queueEmail(tx, first || issueLogin ? 'gallery.delivered' : 'gallery.resent', {
+        to: data.deliveredToEmail, galleryId: id, clientId: g.clientId, bookingId: g.bookingId,
+        data: { subject: data.deliverySubject ?? undefined, issueLogin },
+      });
     });
     return this.get(id);
   }
@@ -518,6 +526,7 @@ class GalleryModel {
       const next = toStudio(g.expiresAt).plus({ days }).toUTC().toJSDate();
       await tx.gallery.update({ where: { id }, data: { expiresAt: next, expiryReminderSentAt: null } });
       await event(tx, g, actorId, 'gallery.extended', `Gallery extended ${days} days`, { days });
+      await queueEmail(tx, 'gallery.extended', { galleryId: id, clientId: g.clientId, bookingId: g.bookingId });
     });
     return this.get(id);
   }

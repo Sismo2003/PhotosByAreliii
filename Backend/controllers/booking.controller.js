@@ -151,6 +151,11 @@ export const markReviewReceived = action(
   'Review marked as received',
   'Failed to mark review',
 );
+export const sendFollowUpEmail = action(
+  (id, body) => BookingModel.sendFollowUpEmail(id, body.key),
+  'Email on its way',
+  'Failed to send the email',
+);
 export const setRebookReminder = action(
   (id, body, actorId) => BookingModel.setRebookReminder(id, body, actorId),
   'Rebook reminder saved',

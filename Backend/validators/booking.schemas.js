@@ -102,6 +102,10 @@ export const cancelBody = body({
 
 export const emptyBody = body({});
 
+export const followUpEmailBody = body({
+  key: oneOf(['followup.thanks', 'followup.review_request'], 'key').required(),
+});
+
 export const rebookBody = body({
   kind: yup
     .string()
@@ -199,4 +203,6 @@ export const createBookingBody = body({
     })
     .noUnknown(true)
     .default({ mode: 'NONE' }),
+  // "Email the client" switch (confirmation or deposit request, by the booking's status).
+  emailClient: yup.boolean().strict().default(false),
 });

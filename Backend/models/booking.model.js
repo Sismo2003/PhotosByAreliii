@@ -26,6 +26,7 @@ import {
   withSettingsFallback,
 } from '../services/booking-derive.js';
 import { syncLoginEmail } from './login-email.js';
+import { queueEmail } from '../services/email/outbox.js';
 
 const MAX_PAGE_SIZE = 100;
 const REVIEWABLE_MATCHES = ['PHONE', 'CONFLICT'];
@@ -417,6 +418,7 @@ class BookingModel {
           metadata: note ? { note } : undefined,
         },
       });
+      await queueEmail(tx, 'booking.accepted_pay_deposit', { bookingId: booking.id, clientId: booking.clientId });
       return booking;
     });
   }
@@ -435,6 +437,8 @@ class BookingModel {
           metadata: { reason },
         },
       });
+      // The reason is Areli's note; the client gets the kind default text, not the note.
+      await queueEmail(tx, 'booking.declined', { bookingId: booking.id, clientId: booking.clientId });
       return booking;
     });
   }
@@ -569,6 +573,7 @@ class BookingModel {
         `${formatCents(amountCents)} ${what} received · ${METHOD_LABEL[method]}${overCents ? ` · ${formatCents(overCents)} over the balance (confirmed by admin)` : ''}${confirms ? ' — booking confirmed' : ''}`,
         { paymentId: payment.id, kind, method, amountCents, note: note || undefined, confirmed: confirms, overCents: overCents || undefined },
       );
+      if (confirms) await queueEmail(tx, 'booking.confirmed', { bookingId: id, clientId: booking.clientId });
     });
     return this.detailBooking(id);
   }
@@ -595,6 +600,9 @@ class BookingModel {
         `Rescheduled from ${sessionLabel(booking.startsAt)} to ${sessionLabel(next)}`,
         { from: toStudio(booking.startsAt).toUTC().toISO(), to: next.toISO(), rescheduleCount: booking.rescheduleCount + 1 },
       );
+      await queueEmail(tx, 'booking.rescheduled', {
+        bookingId: id, clientId: booking.clientId, data: { previousStartsAt: toStudio(booking.startsAt).toUTC().toISO() },
+      });
     });
     return this.detailBooking(id);
   }
@@ -633,6 +641,10 @@ class BookingModel {
         `Booking cancelled — ${CANCEL_LABEL[reason]}${money}`,
         { reason, deposit, paidCents: paid, refundedCents: refund ? paid : 0 },
       );
+      // A no-show isn't told by email (docs/correos.md #7): Areli talks to them herself.
+      if (reason !== 'NO_SHOW') {
+        await queueEmail(tx, 'booking.cancelled', { bookingId: id, clientId: booking.clientId, data: { cancelReason: reason } });
+      }
     });
     return this.detailBooking(id);
   }
@@ -653,6 +665,7 @@ class BookingModel {
       await logEvent(tx, booking, actorId, 'booking.expired', 'Marked as expired — no deposit received', {
         depositDueAt: booking.depositDueAt ? toStudio(booking.depositDueAt).toUTC().toISO() : null,
       });
+      await queueEmail(tx, 'booking.expired', { bookingId: id, clientId: booking.clientId });
     });
     return this.detailBooking(id);
   }
@@ -714,6 +727,27 @@ class BookingModel {
       );
       const booking = await findForAction(tx, id);
       await logEvent(tx, booking, actorId, 'booking.unarchived', 'Moved back to follow-up');
+    });
+    return this.detailBooking(id);
+  }
+
+  // "Send thank-you" / "Ask for a review" (docs/bookings-page-integraciones.md §3.1–3.2). Sent from
+  // the booking's Follow-up step; the review ask also moves reviewStatus to REQUESTED.
+  static async sendFollowUpEmail(id, key) {
+    await prisma.$transaction(async (tx) => {
+      const booking = await findForAction(tx, id);
+      if (!ACTIVE_STATUSES.includes(booking.status)) {
+        throw new HttpError(409, `Follow-up emails are for active bookings — this one is ${statusWord(booking.status)}`);
+      }
+      if (key === 'followup.review_request') {
+        if (booking.reviewStatus === 'RECEIVED') throw new HttpError(409, 'The review is already received');
+        const settings = await tx.studioSettings.findUnique({ where: { id: 1 }, select: { reviewUrl: true } });
+        if (!settings?.reviewUrl) throw new HttpError(409, 'Add your review link in Settings → Email first');
+        await tx.booking.update({ where: { id }, data: { reviewStatus: 'REQUESTED', reviewRequestedAt: DateTime.utc().toJSDate() } });
+      }
+      // force: Areli pressed the button, so it goes out even while automatic emails are paused.
+      // The History line ("Email sent: …") is written by the worker once it really went out.
+      await queueEmail(tx, key, { bookingId: id, clientId: booking.clientId, data: { force: true } });
     });
     return this.detailBooking(id);
   }

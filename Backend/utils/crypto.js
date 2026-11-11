@@ -5,28 +5,35 @@
 import crypto from 'node:crypto';
 import { JWT_SECRET } from '../config/main.js';
 
-const key = crypto.createHash('sha256').update(process.env.GALLERY_ENC_KEY || `dev:${JWT_SECRET}`).digest();
-
-/** text → "iv.tag.ciphertext" (base64url). */
-export function encrypt(text) {
-  const iv = crypto.randomBytes(12);
-  const cipher = crypto.createCipheriv('aes-256-gcm', key, iv);
-  const data = Buffer.concat([cipher.update(String(text), 'utf8'), cipher.final()]);
-  return [iv, cipher.getAuthTag(), data].map((b) => b.toString('base64url')).join('.');
+/** An encrypt/decrypt pair keyed by `secret` (any long string; it is hashed to 32 bytes). */
+export function createCipher(secret) {
+  const key = crypto.createHash('sha256').update(secret).digest();
+  return {
+    /** text → "iv.tag.ciphertext" (base64url). */
+    encrypt(text) {
+      const iv = crypto.randomBytes(12);
+      const cipher = crypto.createCipheriv('aes-256-gcm', key, iv);
+      const data = Buffer.concat([cipher.update(String(text), 'utf8'), cipher.final()]);
+      return [iv, cipher.getAuthTag(), data].map((b) => b.toString('base64url')).join('.');
+    },
+    /** The inverse of encrypt(); null when the value is empty or can't be decrypted. */
+    decrypt(value) {
+      if (!value) return null;
+      try {
+        const [iv, tag, data] = value.split('.').map((p) => Buffer.from(p, 'base64url'));
+        const decipher = crypto.createDecipheriv('aes-256-gcm', key, iv);
+        decipher.setAuthTag(tag);
+        return Buffer.concat([decipher.update(data), decipher.final()]).toString('utf8');
+      } catch {
+        return null;
+      }
+    },
+  };
 }
 
-/** The inverse of encrypt(); null when the value is empty or can't be decrypted. */
-export function decrypt(value) {
-  if (!value) return null;
-  try {
-    const [iv, tag, data] = value.split('.').map((p) => Buffer.from(p, 'base64url'));
-    const decipher = crypto.createDecipheriv('aes-256-gcm', key, iv);
-    decipher.setAuthTag(tag);
-    return Buffer.concat([decipher.update(data), decipher.final()]).toString('utf8');
-  } catch {
-    return null;
-  }
-}
+const gallery = createCipher(process.env.GALLERY_ENC_KEY || `dev:${JWT_SECRET}`);
+export const encrypt = gallery.encrypt;
+export const decrypt = gallery.decrypt;
 
 /** A random 4-digit PIN ("0042" is possible). */
 export const randomPin = () => String(crypto.randomInt(0, 10000)).padStart(4, '0');
